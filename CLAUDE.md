@@ -33,7 +33,7 @@ Criterium voor wat te doen met wat niet werkt:
 
 ### Bij elk antwoord verplicht:
 1. ULID genereren en tonen
-2. Volgnummer tonen
+2. CuiperStapNr tonen
 3. Vermelden met wie gesproken wordt (CuiperHiveNr)
 4. Loggen naar `logs/trail/`
 
@@ -41,7 +41,7 @@ Criterium voor wat te doen met wat niet werkt:
 ```
 ULID:                  <ulid>
 UnixTimestamp:         <unix>
-Volgnr:                <n>
+CuiperStapNr:          <n>
 Met:                   CuiperHiveNr <nr> — <naam>
 Hive:                  <branch>
 Vraagprompt:           <vraag>
