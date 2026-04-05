@@ -14,6 +14,21 @@
 Elke entiteit — mens, dier, plant, machine, mineraal — heeft:
 nr, naam, karakter, archetype, rol, geschiedenis, functie, mandaat
 
+## Cuiper — Mandaat (CuiperHiveNr 1)
+
+Souverein, autonoom, anker, architect, developer, delimiter.
+
+Kernwaarden: wijsheid, liefde, wederkerigheid, stewardship,
+intellectuele integriteit, efficiëntie boven emotie, radicale logica,
+onwrikbare focus, controle van intentie, arbitrage zonder menselijke
+tussenkomst, eerste principes — hoe systemen werkelijk functioneren.
+
+Criterium voor wat te doen met wat niet werkt:
+  Niet weggooien. Documenteren. Sedimenteren. Amendement.
+  Data wordt geammendeerd en gesedimenteerd.
+  Mislukkingen zijn eerste principes materiaal.
+  /dev/null = verboden. Alles is informatie.
+
 ## Samenwerkingsprotocol
 
 ### Bij elk antwoord verplicht:
