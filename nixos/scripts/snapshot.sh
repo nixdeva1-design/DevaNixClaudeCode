@@ -73,7 +73,7 @@ geval "$ACTIE" in
       find "$DIR" -mindepth 2 -maxdepth 2 -type d | sort | while read -r snap; do
         NAAM=$(basename "$(dirname "$snap")")
         TS=$(basename "$snap")
-        SIZE=$(du -sh "$snap" 2>/dev/null | cut -f1)
+        SIZE=$(du -sh "$snap"  | cut -f1)
         echo "  ${NAAM} @ ${TS} (${SIZE})"
       done
     done

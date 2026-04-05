@@ -46,7 +46,7 @@ git commit -q -m "init: ${PROJECT}"
 
 # PostgreSQL database aanmaken
 echo "Database aanmaken: ${DB_NAAM}"
-psql -U reparateur -c "CREATE DATABASE ${DB_NAAM} OWNER reparateur;" 2>/dev/null \
+psql -U reparateur -c "CREATE DATABASE ${DB_NAAM} OWNER reparateur;"  \
   && echo "Database aangemaakt: ${DB_NAAM}" \
   || echo "Database bestaat al: ${DB_NAAM}"
 
@@ -54,9 +54,9 @@ psql -U reparateur -c "CREATE DATABASE ${DB_NAAM} OWNER reparateur;" 2>/dev/null
 echo "Gitea repo aanmaken: lab-${PROJECT}"
 curl -s -X POST "${GITEA_URL}/api/v1/user/repos" \
   -H "Content-Type: application/json" \
-  -u "${GITEA_USER}:$(cat ~/.config/gitea/token 2>/dev/null || echo 'token')" \
+  -u "${GITEA_USER}:$(cat ~/.config/gitea/token  || echo 'token')" \
   -d "{\"name\": \"lab-${PROJECT}\", \"description\": \"Lab: ${PROJECT}\", \"private\": true}" \
-  > /dev/null && echo "Gitea repo aangemaakt" || echo "Gitea token nog instellen via ~/.config/gitea/token"
+   && echo "Gitea repo aangemaakt" || echo "Gitea token nog instellen via ~/.config/gitea/token"
 
 # Logseq pagina aanmaken
 mkdir -p "/data/logseq/pages"
