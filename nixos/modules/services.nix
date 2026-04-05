@@ -101,13 +101,23 @@
 
   # ─── Data mappen aanmaken bij boot ───────────────────────────────────────
   systemd.tmpfiles.rules = [
-    "d /data                0755 reparateur users -"
-    "d /data/postgresql     0700 postgres    postgres -"
-    "d /data/gitea          0755 gitea       gitea -"
-    "d /data/ollama         0755 reparateur  users -"
-    "d /data/n8n            0755 reparateur  users -"
-    "d /data/logseq         0755 reparateur  users -"
-    "d /data/docker         0755 root        root -"
-    "d /projects            0755 reparateur  users -"
+    # Systeem data
+    "d /data                    0755 reparateur users -"
+    "d /data/postgresql         0700 postgres    postgres -"
+    "d /data/gitea              0755 gitea       gitea -"
+    "d /data/ollama             0755 reparateur  users -"
+    "d /data/n8n                0755 reparateur  users -"
+    "d /data/logseq             0755 reparateur  users -"
+    "d /data/docker             0755 root        root -"
+
+    # Klantprojecten — gescheiden van lab
+    "d /projects                0755 reparateur  users -"
+
+    # Persoonlijk lab — gescheiden van klanten
+    "d /lab                     0755 reparateur  users -"
+    "d /lab/projecten           0755 reparateur  users -"
+    "d /lab/tests               0755 reparateur  users -"
+    "d /lab/docs                0755 reparateur  users -"
+    "d /lab/experimenten        0755 reparateur  users -"
   ];
 }

@@ -64,14 +64,18 @@
     shellAliases = {
       # Navigatie
       proj = "cd /projects";
+      lab  = "cd /lab/projecten";
       data = "cd /data";
 
       # NixOS beheer
       rebuild = "sudo nixos-rebuild switch --flake /home/reparateur/.config/nixos#reparatie-usb";
       update  = "nix flake update /home/reparateur/.config/nixos";
 
-      # Klant werkplek
-      nieuw-klant = "/home/reparateur/.config/nixos/scripts/nieuwe-klant.sh";
+      # Klant werkplek (gescheiden van lab)
+      nieuw-klant    = "/home/reparateur/.config/nixos/scripts/nieuwe-klant.sh";
+
+      # Lab project (gescheiden van klanten)
+      nieuw-project  = "/home/reparateur/.config/nixos/scripts/nieuw-lab-project.sh";
 
       # Services
       db    = "pgcli -U reparateur";
