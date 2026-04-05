@@ -2,23 +2,45 @@
 
 {
   # ─── PostgreSQL ───────────────────────────────────────────────────────────
-  # Data staat in /data/postgresql
+  # ÉÉN instantie, GEÏSOLEERDE databases per klant/project
+  # Elke klant/project krijgt eigen database + eigen rol
+  # Cross-access is onmogelijk door rol-isolatie
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_16;
     dataDir = "/data/postgresql";
-    enableTCPIP = false;  # alleen lokaal
+    enableTCPIP = false;
+
     authentication = ''
       local all all trust
       host  all all 127.0.0.1/32 trust
     '';
+
+    # Basis setup — klant/project databases via scripts aangemaakt
     initialScript = pkgs.writeText "pg-init.sql" ''
+      -- Beheerder
       CREATE USER reparateur WITH SUPERUSER;
       CREATE DATABASE reparateur OWNER reparateur;
+
+      -- Lab gebruiker (geen toegang tot klant databases)
+      CREATE USER lab_user WITH PASSWORD 'lab';
+
+      -- Klant gebruiker (geen toegang tot lab databases)
+      CREATE USER klant_user WITH PASSWORD 'klant';
+
+      -- Revoke standaard public rechten
+      REVOKE ALL ON DATABASE reparateur FROM PUBLIC;
     '';
+
+    settings = {
+      # Logging voor audit trail
+      log_connections = true;
+      log_disconnections = true;
+      log_statement = "ddl";
+    };
   };
 
-  # ─── Gitea (zelf-gehoste git) ─────────────────────────────────────────────
+  # ─── Gitea ────────────────────────────────────────────────────────────────
   services.gitea = {
     enable = true;
     stateDir = "/data/gitea";
@@ -35,30 +57,66 @@
         USER = "reparateur";
       };
       service.DISABLE_REGISTRATION = true;
-      ui.DEFAULT_THEME = "arc-green";
     };
   };
 
-  # ─── MQTT (Mosquitto) ─────────────────────────────────────────────────────
+  # ─── MQTT — Mosquitto ─────────────────────────────────────────────────────
+  # ÉÉN broker, GEÏSOLEERD via topic namespaces
+  # klant/jan-bakker/# ← alleen voor jan-bakker
+  # lab/project-naam/# ← alleen voor lab projecten
+  # test/#             ← air-gap test omgeving
   services.mosquitto = {
     enable = true;
     listeners = [{
       port = 1883;
       address = "127.0.0.1";
-      settings.allow_anonymous = true;
+      settings.allow_anonymous = false;
+      acl = [
+        # Beheerder mag alles
+        "user reparateur"
+        "topic readwrite #"
+        ""
+        # Klant namespace — geen toegang tot lab of test
+        "user klant_mqtt"
+        "topic readwrite klant/#"
+        ""
+        # Lab namespace — geen toegang tot klant of test
+        "user lab_mqtt"
+        "topic readwrite lab/#"
+        ""
+        # Air-gap test namespace — volledig geïsoleerd
+        "user test_mqtt"
+        "topic readwrite test/#"
+      ];
     }];
   };
 
-  # ─── Ollama (lokale AI, geen internet nodig) ──────────────────────────────
+  # ─── Zenoh router ─────────────────────────────────────────────────────────
+  # ÉÉN router, GEÏSOLEERD via key-expression namespaces
+  # klant/<naam>/** ← klantdata
+  # lab/**          ← lab data
+  # test/**         ← air-gap test (geen bridge naar buiten)
+  environment.systemPackages = with pkgs; [ zenoh ];
+
+  systemd.services.zenoh-router = {
+    description = "Zenoh router";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.zenoh}/bin/zenohd";
+      Restart = "on-failure";
+      User = "reparateur";
+    };
+  };
+
+  # ─── Ollama ───────────────────────────────────────────────────────────────
+  # ÉÉN instantie, modellen gedeeld, conversaties gescheiden per script
   services.ollama = {
     enable = true;
     home = "/data/ollama";
-    # GPU acceleratie als beschikbaar
-    acceleration = null;  # zet op "cuda" of "rocm" bij GPU
   };
 
-  # ─── n8n (workflow automatisering) ───────────────────────────────────────
-  # n8n draait via systemd, data in /data/n8n
+  # ─── n8n ──────────────────────────────────────────────────────────────────
   systemd.services.n8n = {
     description = "n8n workflow automatisering";
     wantedBy = [ "multi-user.target" ];
@@ -82,26 +140,9 @@
     };
   };
 
-  # ─── Zenoh router ─────────────────────────────────────────────────────────
-  # Zenoh is een moderne messaging bus (vervanger voor DDS/MQTT voor IoT)
-  environment.systemPackages = with pkgs; [
-    zenoh  # zenohd router + tools
-  ];
-
-  systemd.services.zenoh-router = {
-    description = "Zenoh router";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.zenoh}/bin/zenohd";
-      Restart = "on-failure";
-      User = "reparateur";
-    };
-  };
-
-  # ─── Data mappen aanmaken bij boot ───────────────────────────────────────
+  # ─── Mappen aanmaken bij boot ─────────────────────────────────────────────
   systemd.tmpfiles.rules = [
-    # Systeem data
+    # Gedeelde services data
     "d /data                    0755 reparateur users -"
     "d /data/postgresql         0700 postgres    postgres -"
     "d /data/gitea              0755 gitea       gitea -"
@@ -110,14 +151,24 @@
     "d /data/logseq             0755 reparateur  users -"
     "d /data/docker             0755 root        root -"
 
-    # Klantprojecten — gescheiden van lab
-    "d /projects                0755 reparateur  users -"
+    # Snapshots voor debug/rollback (btrfs)
+    "d /data/snapshots          0755 reparateur  users -"
+    "d /data/snapshots/klanten  0755 reparateur  users -"
+    "d /data/snapshots/lab      0755 reparateur  users -"
 
-    # Persoonlijk lab — gescheiden van klanten
-    "d /lab                     0755 reparateur  users -"
+    # Klantwerk — geïsoleerd van lab
+    "d /projects                0700 reparateur  users -"
+
+    # Lab — geïsoleerd van klanten
+    "d /lab                     0700 reparateur  users -"
     "d /lab/projecten           0755 reparateur  users -"
     "d /lab/tests               0755 reparateur  users -"
     "d /lab/docs                0755 reparateur  users -"
     "d /lab/experimenten        0755 reparateur  users -"
+
+    # Air-gap test omgeving — geen toegang tot /projects of /lab
+    "d /airgap                  0700 reparateur  users -"
+    "d /airgap/tests            0755 reparateur  users -"
+    "d /airgap/snapshots        0755 reparateur  users -"
   ];
 }

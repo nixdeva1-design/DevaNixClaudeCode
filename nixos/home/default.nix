@@ -82,6 +82,14 @@
       gitea = "xdg-open http://localhost:3000";
       n8n   = "xdg-open http://localhost:5678";
 
+      # Snapshots / debug
+      snap       = "/home/reparateur/.config/nixos/scripts/snapshot.sh maak";
+      snaps      = "/home/reparateur/.config/nixos/scripts/snapshot.sh lijst";
+      herstel    = "/home/reparateur/.config/nixos/scripts/snapshot.sh herstel";
+
+      # Air-gap test omgeving
+      airgap     = "cd /airgap/tests";
+
       # Ollama
       ai    = "ollama run mistral";
       chat  = "ollama run llama3.2";
