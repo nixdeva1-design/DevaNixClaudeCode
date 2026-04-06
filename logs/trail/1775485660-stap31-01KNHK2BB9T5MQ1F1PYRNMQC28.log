@@ -16,4 +16,4 @@ Plan:                  1. CuiperVocabulaire in CLAUDE.md
 CuiperStatusBackup31:  c5e2901 — stap 30 actief, geen counter, geen hook, vaste drempel
 CuiperVerwachtBackup31: dynamische drempel actief, elke respons auto-vastgelegd
 Rollbackpunt:          c5e2901
-CuiperNaVerwachtBackup31: pending
+CuiperNaVerwachtBackup31: 84ac43f gepusht — C == B, transitie geslaagd
