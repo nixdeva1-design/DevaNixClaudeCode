@@ -129,10 +129,5 @@
     "d /data/logs/nginx   0755 nginx nginx -"
   ];
 
-  # ─── Firewall poorten openen ──────────────────────────────────────────────
-  networking.firewall.allowedTCPPorts = [
-    80    # HTTP
-    443   # HTTPS
-    7447  # Zenoh
-  ];
+  # Firewall poorten worden centraal beheerd in system.nix
 }

@@ -71,15 +71,33 @@
     firewall = {
       enable = true;
       allowedTCPPorts = [
-        22    # SSH
+        # Standaard internet verkeer
         80    # HTTP
         443   # HTTPS
+
+        # Beheer
+        22    # SSH
+
+        # Services — intern en extern via Nginx
         3000  # Gitea
-        5432  # PostgreSQL (lokaal)
         5678  # n8n
-        1883  # MQTT
-        7447  # Zenoh
+        3100  # Grafana
         11434 # Ollama
+        47334 # MindsDB
+        8080  # API gateway
+
+        # Messaging bus
+        7447  # Zenoh
+        1883  # MQTT
+
+        # Database — alleen lokaal, niet via firewall naar buiten
+        # 5432 PostgreSQL — bewust weggelaten, alleen via localhost
+      ];
+
+      # Uitgaand verkeer nooit blokkeren
+      # USB surft normaal internet via host netwerk
+      allowedUDPPorts = [
+        7447  # Zenoh UDP
       ];
     };
   };
