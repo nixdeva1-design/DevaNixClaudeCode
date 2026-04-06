@@ -32,7 +32,7 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 | 01JWQN15 | OPEN | MEDIUM | CuiperOerOntologie SQL laden in PostgreSQL bij boot | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
 | 01JWQN16 | KLAAR | MEDIUM | Rust crate bus-core (Zenoh wrapper + namespace traits) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN17 | OPEN | MEDIUM | Rust crate namespace-guard (isolatie enforcer) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
-| 01JWQN18 | OPEN | MEDIUM | Rust crate router (signaal routing engine) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN18 | KLAAR | MEDIUM | Rust crate router (signaal routing engine) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN19 | OPEN | LAAG | Pro abonnement opzeggen (dinsdag) | 7 | 01JWQMV4R6P8NXWQ2KD5YCBHT3 |
 | 01JWQN20 | OPEN | LAAG | Kali Linux op USB testen via Ventoy GRUB2 modus | 2 | 01JWQM8K4N2X7RVHP3FD9QCBT5 |
 | 01JWQN21 | OPEN | LAAG | CuiperConnect.sh VPN certificaten configureren | 15 | 01JWQMW6X4P7RVWN3KE8HBCDS2 |
