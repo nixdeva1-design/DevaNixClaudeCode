@@ -15,9 +15,9 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 
 | ID | Status | Prioriteit | Taak | StapNr | ULID |
 |----|--------|------------|------|--------|------|
-| 01JWQN01 | OPEN | KRITIEK | Rust workspace aanmaken (cuiper-core crate) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
-| 01JWQN02 | OPEN | KRITIEK | Datalog/Prolog inferentie engine in Rust | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
-| 01JWQN03 | OPEN | KRITIEK | OpenCog Hyperon NixOS module | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN01 | KLAAR | KRITIEK | Rust workspace aanmaken (cuiper-core crate) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN02 | KLAAR | KRITIEK | Datalog/Prolog inferentie engine in Rust | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN03 | KLAAR | KRITIEK | OpenCog Hyperon NixOS module | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN04 | OPEN | HOOG | CuiperNginx.nix poorten via CuiperPorts.nix | 20 | 01JWQN3K7P8RXWV2LD4HBCDS7N |
 | 01JWQN05 | OPEN | HOOG | API gateway module (CuiperApiGateway.nix) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN06 | OPEN | HOOG | CuiperHeader definitie in code bestanden | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |

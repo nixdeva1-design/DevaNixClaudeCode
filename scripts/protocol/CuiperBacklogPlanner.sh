@@ -197,7 +197,7 @@ prioriteit() {
 
   # Vervang huidige prioriteit (KRITIEK|HOOG|MEDIUM|LAAG) op de regel die $TAAK_ID bevat
   OUD_PRIO=$(grep "$TAAK_ID" "$BACKLOG_FILE" | grep -oP '(KRITIEK|HOOG|MEDIUM|LAAG)' | head -1)
-  sed -i "/\(KRITIEK\|HOOG\|MEDIUM\|LAAG\).*${TAAK_ID}/s/${OUD_PRIO}/${NIEUW_PRIO}/" "$BACKLOG_FILE"
+  sed -i "/${TAAK_ID}/s/| ${OUD_PRIO} |/| ${NIEUW_PRIO} |/" "$BACKLOG_FILE"
 
   echo "Prioriteit gewijzigd: [${TAAK_ID}] ${OUD_PRIO} → ${NIEUW_PRIO}"
 
@@ -218,7 +218,7 @@ status() {
   esac
 
   OUD_STATUS=$(grep "$TAAK_ID" "$BACKLOG_FILE" | grep -oP '(OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD)' | head -1)
-  sed -i "/\(OPEN\|BEZIG\|KLAAR\|GEBLOKKEERD\|GESEDIMENTEERD\).*${TAAK_ID}/s/${OUD_STATUS}/${NIEUW_STATUS}/" "$BACKLOG_FILE"
+  sed -i "/${TAAK_ID}/s/| ${OUD_STATUS} |/| ${NIEUW_STATUS} |/" "$BACKLOG_FILE"
 
   echo "Status gewijzigd: [${TAAK_ID}] ${OUD_STATUS} → ${NIEUW_STATUS}"
 
