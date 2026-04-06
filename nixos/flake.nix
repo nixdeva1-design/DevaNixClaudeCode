@@ -30,6 +30,7 @@
           ./modules/desktop.nix
           ./modules/services.nix
           ./modules/dev.nix
+          ./modules/nginx.nix
 
           # Home Manager als module zodat het mee rebuildt
           home-manager.nixosModules.home-manager {
