@@ -45,9 +45,9 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 | 01JWQN28 | KLAAR | HOOG | Machine laag + gedeelde LSP Neovim/VSCodium | 28 | 01JWQNJ2K6P8RXWN4LD7HBCDS9M |
 | 01JWQN29 | KLAAR | MEDIUM | Guest scripts CuiperAgent/CuiperDrop | 10 | 01JWQMN9R5P7SXWV4KE2HBCDT8 |
 | 01JWQN30 | KLAAR | MEDIUM | CuiperCamelCase hernoeming | 25 | 01JWQND4K7P8RXWN5LD2HBCDS6T |
-| 01KNJCN9 | OPEN | KRITIEK | Rust tests cuiper-core + cuiper-datalog | 35 | 01KNJCN9G2AHMP1PPS5T6NT7TQ |
-| 01KNJCN9 | OPEN | HOOG | CuiperListener integratie CuiperPromptCounter (Jaeger tracing) | 35 | 01KNJCN9GQZMPXZE3CPC9SBZ6T |
-| 01KNJCN9 | OPEN | HOOG | CuiperHiveCoreOntologie laden bij boot in PostgreSQL | 35 | 01KNJCN9GAYREY26R3YQ3KFVJM |
-| 01KNJCN9 | OPEN | MEDIUM | Jaeger UI vhost in CuiperNginx.nix (poort 16686) | 35 | 01KNJCN9GH9CPAW7JQ7796EC7J |
-| 01KNJCN9 | OPEN | MEDIUM | n8n werkflow template: Ollama + Zenoh bus koppeling | 35 | 01KNJCN9GYADWES02QME3WAKDW |
-| 01KNJCN9 | OPEN | HOOG | CuiperHeader definitie in alle code bestanden toepassen | 35 | 01KNJCN9H5BP1YFKSG3YXWNNTT |
+| 01KNJCNG2 | KLAAR | KRITIEK | Rust tests cuiper-core + cuiper-datalog | 36 | 01KNJCN9G2AHMP1PPS5T6NT7TQ |
+| 01KNJCNGQ | KLAAR | HOOG | CuiperListener integratie CuiperPromptCounter (Jaeger tracing) | 36 | 01KNJCN9GQZMPXZE3CPC9SBZ6T |
+| 01KNJCNGA | OPEN | HOOG | CuiperHiveCoreOntologie laden bij boot in PostgreSQL | 35 | 01KNJCN9GAYREY26R3YQ3KFVJM |
+| 01KNJCNGH | OPEN | MEDIUM | Jaeger UI vhost in CuiperNginx.nix (poort 16686) | 35 | 01KNJCN9GH9CPAW7JQ7796EC7J |
+| 01KNJCNGY | OPEN | MEDIUM | n8n werkflow template: Ollama + Zenoh bus koppeling | 35 | 01KNJCN9GYADWES02QME3WAKDW |
+| 01KNJCNH5 | OPEN | HOOG | CuiperHeader definitie in alle code bestanden toepassen | 35 | 01KNJCN9H5BP1YFKSG3YXWNNTT |
