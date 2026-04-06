@@ -1,0 +1,38 @@
+[2026-04-06 10:10:09] STEWARD: ═══════════════════════════════════════
+[2026-04-06 10:10:09] STEWARD: CuiperSteward sessie geopend
+[2026-04-06 10:10:09] STEWARD: ULID: 01KNH4AT1DGT586AGWWJ86PPY7
+[2026-04-06 10:10:09] STEWARD: Tijdstip: 2026-04-06 10:10:09
+[2026-04-06 10:10:09] STEWARD: Laatste CuiperStapNr: 28
+[2026-04-06 10:10:09] STEWARD: Laatste commit: 326b4656b4ab21197c967aa3474805deb8b806be
+[2026-04-06 10:10:09] STEWARD: Branch: claude/linux-usb-dual-boot-Hsk67
+[2026-04-06 10:10:09] STEWARD: Ontwerpen controleren...
+[2026-04-06 10:10:09] STEWARD: OK: scripts/protocol/CuiperUlid.sh
+[2026-04-06 10:10:09] STEWARD: ONTBREEKT: nixos/db/002_cuiper_oer_ontologie.sql — Ontologie SQL schema
+[2026-04-06 10:10:09] STEWARD: OK: scripts/protocol/CuiperVerify.sh
+[2026-04-06 10:10:09] STEWARD: OK: nixos/flake.nix
+[2026-04-06 10:10:09] STEWARD: OK: CLAUDE.md
+[2026-04-06 10:10:09] STEWARD: OK: scripts/protocol/CuiperLog.sh
+[2026-04-06 10:10:09] STEWARD: ONTBREEKT: nixos/db/001_port_conflict_registry.sql — Poort conflict kennisdb
+[2026-04-06 10:10:09] STEWARD: OK: ontologie/CuiperOerOntologie.md
+[2026-04-06 10:10:09] STEWARD: OK: nixos/modules/CuiperPorts.nix
+[2026-04-06 10:10:09] STEWARD: WAARSCHUWING: 2 verplichte bestanden ontbreken
+[2026-04-06 10:10:31] STEWARD: ═══════════════════════════════════════
+[2026-04-06 10:10:31] STEWARD: CuiperSteward sessie geopend
+[2026-04-06 10:10:31] STEWARD: ULID: 01KNH4BG7S1ACFNJ0AKK1ZBXRG
+[2026-04-06 10:10:31] STEWARD: Tijdstip: 2026-04-06 10:10:31
+[2026-04-06 10:10:31] STEWARD: Laatste CuiperStapNr: 28
+[2026-04-06 10:10:31] STEWARD: Laatste commit: 326b4656b4ab21197c967aa3474805deb8b806be
+[2026-04-06 10:10:31] STEWARD: Branch: claude/linux-usb-dual-boot-Hsk67
+[2026-04-06 10:10:31] STEWARD: Ontwerpen controleren...
+[2026-04-06 10:10:31] STEWARD: OK: scripts/protocol/CuiperUlid.sh
+[2026-04-06 10:10:31] STEWARD: OK: scripts/protocol/CuiperVerify.sh
+[2026-04-06 10:10:31] STEWARD: OK: nixos/db/001_CuiperPortConflictRegistry.sql
+[2026-04-06 10:10:31] STEWARD: OK: nixos/flake.nix
+[2026-04-06 10:10:31] STEWARD: OK: CLAUDE.md
+[2026-04-06 10:10:31] STEWARD: OK: nixos/db/002_CuiperOerOntologie.sql
+[2026-04-06 10:10:31] STEWARD: OK: scripts/protocol/CuiperLog.sh
+[2026-04-06 10:10:31] STEWARD: OK: ontologie/CuiperOerOntologie.md
+[2026-04-06 10:10:31] STEWARD: OK: nixos/modules/CuiperPorts.nix
+[2026-04-06 10:10:31] STEWARD: Alle ontwerpen aanwezig.
+[2026-04-06 10:10:31] STEWARD: Sessie klaar. Volgende CuiperStapNr: 29
+[2026-04-06 10:10:31] STEWARD: ═══════════════════════════════════════

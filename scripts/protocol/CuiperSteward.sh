@@ -46,8 +46,8 @@ controleer_ontwerpen() {
   declare -A VERPLICHT=(
     ["CLAUDE.md"]="Protocol en hive definitie"
     ["ontologie/CuiperOerOntologie.md"]="Oer ontologie definitie"
-    ["nixos/db/001_port_conflict_registry.sql"]="Poort conflict kennisdb"
-    ["nixos/db/002_cuiper_oer_ontologie.sql"]="Ontologie SQL schema"
+    ["nixos/db/001_CuiperPortConflictRegistry.sql"]="Poort conflict kennisdb"
+    ["nixos/db/002_CuiperOerOntologie.sql"]="Ontologie SQL schema"
     ["nixos/flake.nix"]="NixOS flake"
     ["nixos/modules/CuiperPorts.nix"]="Centrale poortregistry"
     ["scripts/protocol/CuiperUlid.sh"]="ULID generator"
