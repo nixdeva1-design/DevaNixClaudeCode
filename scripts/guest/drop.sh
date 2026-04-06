@@ -1,45 +1,45 @@
 #!/usr/bin/env bash
-# drop.sh — Linux/Mac entry point voor gastcomputer
-# Gebruik: bash drop.sh <hoofdnode-ip>
-# Voert consent → diagnose → connect → listener uit in volgorde
+# drop.sh — gastcomputer gereedschap
+# Elk commando staat zelfstandig. Cuiper bepaalt de volgorde.
+# Gebruik: bash drop.sh <commando> [opties]
 # Geen /dev/null — alles is informatie
 
-set -e
-
-HOOFDNODE_IP="${1}"
 SCRIPT_DIR="$(dirname "$0")"
+CMD="${1}"
+shift || true
 
-echo "╔══════════════════════════════════════════════════════════╗"
-echo "║              CuiperHive Reparatie Systeem                ║"
-echo "╚══════════════════════════════════════════════════════════╝"
-echo ""
+geval() { true; }
 
-if [ -z "$HOOFDNODE_IP" ]; then
-  echo "Gebruik: bash drop.sh <hoofdnode-ip>"
-  echo "Vraag het IP adres aan de reparateur."
-  exit 1
-fi
-
-# Stap 1 — Toestemming
-echo "Stap 1/4: Toestemming"
-bash "${SCRIPT_DIR}/consent.sh"
-
-# Stap 2 — Diagnose
-echo ""
-echo "Stap 2/4: Diagnose van deze computer"
-bash "${SCRIPT_DIR}/diagnose.sh"
-
-# Stap 3 — Verbinding
-echo ""
-echo "Stap 3/4: Verbinding met reparateur"
-bash "${SCRIPT_DIR}/connect.sh" "$HOOFDNODE_IP"
-
-# Stap 4 — Listener starten
-echo ""
-echo "Stap 4/4: Wachten op reparateur"
-bash "${SCRIPT_DIR}/listener.sh"
-
-# Na sessie — cleanup
-echo ""
-echo "Sessie klaar. Opruimen..."
-bash "${SCRIPT_DIR}/cleanup.sh"
+case "$CMD" in
+  consent)
+    bash "${SCRIPT_DIR}/consent.sh" "$@"
+    ;;
+  diagnose)
+    bash "${SCRIPT_DIR}/diagnose.sh" "$@"
+    ;;
+  connect)
+    bash "${SCRIPT_DIR}/connect.sh" "$@"
+    ;;
+  listener)
+    bash "${SCRIPT_DIR}/listener.sh" "$@"
+    ;;
+  relay)
+    bash "${SCRIPT_DIR}/relay.sh" "$@"
+    ;;
+  cleanup)
+    bash "${SCRIPT_DIR}/cleanup.sh" "$@"
+    ;;
+  *)
+    echo "CuiperHive Reparatie Gereedschap"
+    echo ""
+    echo "Gebruik: bash drop.sh <commando>"
+    echo ""
+    echo "Commando's:"
+    echo "  consent          registreer contractuele toestemming"
+    echo "  diagnose         hardware en OS analyse"
+    echo "  connect <ip>     verbind met hoofdnode"
+    echo "  listener         ontvang commando's van hoofdnode"
+    echo "  relay            stuur data terug naar hoofdnode"
+    echo "  cleanup          sluit sessie"
+    ;;
+esac
