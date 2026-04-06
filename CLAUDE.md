@@ -33,9 +33,11 @@ Criterium voor wat te doen met wat niet werkt:
 
 ### Bij elk antwoord verplicht:
 1. ULID genereren en tonen
-2. CuiperStapNr tonen
+2. CuiperStapNr tonen — lees laatste waarde uit logs/trail/ of git log
 3. Vermelden met wie gesproken wordt (CuiperHiveNr)
 4. Loggen naar `logs/trail/`
+5. Bij sessiestart: lees laatste CuiperStapNr van branch claude/linux-usb-dual-boot-Hsk67
+6. Waarschuw Cuiper 10 prompts voor de context limiet bereikt wordt
 
 ### Logformaat per response:
 ```

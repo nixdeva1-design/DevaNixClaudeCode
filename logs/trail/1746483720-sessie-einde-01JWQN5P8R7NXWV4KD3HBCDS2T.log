@@ -1,0 +1,34 @@
+ULID:                    01JWQN5P8R7NXWV4KD3HBCDS2T
+UnixTimestamp:           1746483720
+CuiperStapNr:            21
+Met:                     CuiperHiveNr 1 — Cuiper
+Hive:                    claude/linux-usb-dual-boot-Hsk67
+Type:                    SESSIE_EINDE — context limiet bereikt
+
+Vraagprompt:             sla op, 10 prompts voor de limit melden voortaan,
+                         je leest de laatste CuiperStapNr van Github
+                         claude/linux-usb-dual-boot-Hsk67 de melding en dit
+                         sla je ook op met de ULID referentie als punt in
+                         tijd en volgorde en rede
+
+Redenering:              Context limiet bereikt zonder waarschuwing vooraf.
+                         Protocol aangepast: voortaan waarschuwing 10 prompts
+                         voor limiet. CuiperStapNr lezen uit git log bij
+                         sessiestart.
+
+Reden sessie einde:      Anthropic context limiet bereikt
+
+Laatste commit:          899c146
+Branch:                  claude/linux-usb-dual-boot-Hsk67
+
+Openstaand bij sluiten:
+  - nginx.nix poorten nog niet via ports.nix
+  - api-gateway module ontbreekt
+  - OpenCog Hyperon module ontbreekt
+  - Rust workspace structuur ontbreekt
+
+CuiperStatusBackup{10}:  899c146
+CuiperVerwachtBackup{10}: CLAUDE.md bijgewerkt met limitwaarschuwing
+                          en CuiperStapNr sessiestart protocol
+Rollbackpunt:             899c146
+CuiperNaVerwachtBackup{10}: PENDING — volgende sessie verifieert
