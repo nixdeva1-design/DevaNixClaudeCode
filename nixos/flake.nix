@@ -26,9 +26,11 @@
       nixosConfigurations.reparatie-usb = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
+          ./modules/ports.nix
           ./modules/system.nix
           ./modules/desktop.nix
           ./modules/services.nix
+          ./modules/databases.nix
           ./modules/dev.nix
           ./modules/nginx.nix
 
