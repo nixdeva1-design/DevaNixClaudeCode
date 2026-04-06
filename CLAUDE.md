@@ -37,7 +37,20 @@ Criterium voor wat te doen met wat niet werkt:
 3. Vermelden met wie gesproken wordt (CuiperHiveNr)
 4. Loggen naar `logs/trail/`
 5. Bij sessiestart: lees laatste CuiperStapNr van branch claude/linux-usb-dual-boot-Hsk67
-6. Waarschuw Cuiper 10 prompts voor de context limiet bereikt wordt
+6. Waarschuwing via CuiperPromptCounter (dynamisch, niet vaste drempel)
+7. **Elke respons eindigt met CuiperKlaarMelding** — uitvoer van:
+   `bash scripts/protocol/CuiperKlaarMelding.sh <ulid> <stapnr>`
+
+### CuiperKlaarMelding — verplichte afsluiting elke respons
+
+De KlaarMelding toont altijd:
+- CuiperStapNr + ULID + commit hash + branch
+- Sessie prompt teller + context drempel status
+- Backlog samenvatting per prioriteit (KRITIEK / HOOG / MEDIUM / LAAG / KLAAR)
+- Commando's voor prioriteit en status wijzigen
+
+**Doel:** Cuiper heeft na elke stap direct overzicht zonder zelf te hoeven zoeken.
+Prioriteit wijzigen kan onmiddellijk via het getoonde commando.
 
 ### Logformaat per response:
 ```

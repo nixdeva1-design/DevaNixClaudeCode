@@ -174,13 +174,86 @@ sync() {
   toon
 }
 
+# ─── Prioriteit wijzigen ──────────────────────────────────────────────────
+prioriteit() {
+  local TAAK_ID="${1:-}"
+  local NIEUW_PRIO="${2:-}"
+  [ -z "$TAAK_ID" ] && echo "Gebruik: CuiperBacklogPlanner.sh prioriteit <id> <KRITIEK|HOOG|MEDIUM|LAAG>" && exit 1
+  [ -z "$NIEUW_PRIO" ] && echo "Gebruik: CuiperBacklogPlanner.sh prioriteit <id> <KRITIEK|HOOG|MEDIUM|LAAG>" && exit 1
+
+  case "$NIEUW_PRIO" in
+    KRITIEK|HOOG|MEDIUM|LAAG) ;;
+    *) echo "Ongeldige prioriteit: $NIEUW_PRIO — kies uit KRITIEK|HOOG|MEDIUM|LAAG" && exit 1 ;;
+  esac
+
+  if ! grep -q "$TAAK_ID" "$BACKLOG_FILE"; then
+    echo "Taak niet gevonden: ${TAAK_ID}" && exit 1
+  fi
+
+  # Vervang huidige prioriteit (KRITIEK|HOOG|MEDIUM|LAAG) op de regel die $TAAK_ID bevat
+  OUD_PRIO=$(grep "$TAAK_ID" "$BACKLOG_FILE" | grep -oP '(KRITIEK|HOOG|MEDIUM|LAAG)' | head -1)
+  sed -i "/\(KRITIEK\|HOOG\|MEDIUM\|LAAG\).*${TAAK_ID}/s/${OUD_PRIO}/${NIEUW_PRIO}/" "$BACKLOG_FILE"
+
+  echo "Prioriteit gewijzigd: [${TAAK_ID}] ${OUD_PRIO} → ${NIEUW_PRIO}"
+
+  git -C "$REPO" add "$BACKLOG_FILE"
+  git -C "$REPO" commit -m "CuiperBacklog: prioriteit gewijzigd [${TAAK_ID}] ${OUD_PRIO} → ${NIEUW_PRIO}"
+  git -C "$REPO" push
+}
+
+# ─── Status wijzigen ──────────────────────────────────────────────────────
+status() {
+  local TAAK_ID="${1:-}"
+  local NIEUW_STATUS="${2:-}"
+  [ -z "$TAAK_ID" ] && echo "Gebruik: CuiperBacklogPlanner.sh status <id> <OPEN|BEZIG|KLAAR|GEBLOKKEERD>" && exit 1
+
+  case "$NIEUW_STATUS" in
+    OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD) ;;
+    *) echo "Ongeldige status: $NIEUW_STATUS" && exit 1 ;;
+  esac
+
+  OUD_STATUS=$(grep "$TAAK_ID" "$BACKLOG_FILE" | grep -oP '(OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD)' | head -1)
+  sed -i "/\(OPEN\|BEZIG\|KLAAR\|GEBLOKKEERD\|GESEDIMENTEERD\).*${TAAK_ID}/s/${OUD_STATUS}/${NIEUW_STATUS}/" "$BACKLOG_FILE"
+
+  echo "Status gewijzigd: [${TAAK_ID}] ${OUD_STATUS} → ${NIEUW_STATUS}"
+
+  git -C "$REPO" add "$BACKLOG_FILE"
+  git -C "$REPO" commit -m "CuiperBacklog: status gewijzigd [${TAAK_ID}] ${OUD_STATUS} → ${NIEUW_STATUS}"
+  git -C "$REPO" push
+}
+
+# ─── Samenvatting voor KlaarMelding ──────────────────────────────────────
+samenvatting() {
+  init_backlog
+  local KRITIEK HOOG MEDIUM LAAG KLAAR_N TOTAAL_OPEN
+  KRITIEK=$(grep -c "| OPEN.*KRITIEK\|BEZIG.*KRITIEK\|GEBLOKKEERD.*KRITIEK" "$BACKLOG_FILE" || true)
+  HOOG=$(grep -c "| OPEN.*HOOG\|BEZIG.*HOOG\|GEBLOKKEERD.*HOOG" "$BACKLOG_FILE" || true)
+  MEDIUM=$(grep -c "| OPEN.*MEDIUM\|BEZIG.*MEDIUM\|GEBLOKKEERD.*MEDIUM" "$BACKLOG_FILE" || true)
+  LAAG=$(grep -c "| OPEN.*LAAG\|BEZIG.*LAAG\|GEBLOKKEERD.*LAAG" "$BACKLOG_FILE" || true)
+  KLAAR_N=$(grep -c "| KLAAR " "$BACKLOG_FILE" || true)
+  TOTAAL_OPEN=$(( ${KRITIEK:-0} + ${HOOG:-0} + ${MEDIUM:-0} + ${LAAG:-0} ))
+  printf "  KRITIEK: %s  HOOG: %s  MEDIUM: %s  LAAG: %s  (open: %s / klaar: %s)\n" \
+    "${KRITIEK:-0}" "${HOOG:-0}" "${MEDIUM:-0}" "${LAAG:-0}" "$TOTAAL_OPEN" "${KLAAR_N:-0}"
+}
+
 # ─── Hoofd ────────────────────────────────────────────────────────────────
 case "${1:-toon}" in
-  toon)    toon ;;
-  toevoeg) toevoeg ;;
-  klaar)   klaar "$2" ;;
-  sync)    sync ;;
+  toon)        toon ;;
+  toevoeg)     toevoeg ;;
+  klaar)       klaar "${2:-}" ;;
+  prioriteit)  prioriteit "${2:-}" "${3:-}" ;;
+  status)      status "${2:-}" "${3:-}" ;;
+  samenvatting) samenvatting ;;
+  sync)        sync ;;
   *)
-    echo "Gebruik: CuiperBacklogPlanner.sh <toon|toevoeg|klaar|sync>"
+    echo "Gebruik: CuiperBacklogPlanner.sh <toon|toevoeg|klaar|prioriteit|status|samenvatting|sync>"
+    echo ""
+    echo "  toon                         toon huidige backlog"
+    echo "  toevoeg                      interactief taak toevoegen"
+    echo "  klaar <id>                   taak markeren als KLAAR"
+    echo "  prioriteit <id> <prio>       prioriteit wijzigen (KRITIEK|HOOG|MEDIUM|LAAG)"
+    echo "  status <id> <status>         status wijzigen (OPEN|BEZIG|KLAAR|GEBLOKKEERD)"
+    echo "  samenvatting                 toon tellingen per prioriteit (voor KlaarMelding)"
+    echo "  sync                         synchroniseren met trail logs"
     ;;
 esac
