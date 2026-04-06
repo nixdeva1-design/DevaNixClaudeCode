@@ -17,4 +17,4 @@ Plan:                  1. CuiperPromptCounter.sh — /dev/null vervangen door lo
 CuiperStatusBackup32:  3346286 — stap 31, /dev/null schendingen aanwezig, geen klaarmelding
 CuiperVerwachtBackup32: /dev/null volledig afwezig, klaarmelding verplicht, prioriteit wijzigbaar
 Rollbackpunt:          3346286
-CuiperNaVerwachtBackup32: pending
+CuiperNaVerwachtBackup32: 2352261 gepusht — C == B, transitie geslaagd
