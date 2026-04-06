@@ -1,6 +1,14 @@
 # CuiperClaudeCodeTakenlijst
 # Mandaten en taken van CuiperHiveNr 3 — ClaudeCode
 #
+# Ontologische positie:
+#   Cuiper → CuiperCore → CuiperClaudeCodeTakenlijst → [CuiperOperator] → [implementatie]
+#
+# CuiperCore is de fundamentele laag (crates/cuiper-core/).
+# Dit register erft van CuiperCore — niet direct van Cuiper.
+# Elke operator hieronder erft van dit register.
+# Elke implementatie (.sh / .rs) erft van de operator.
+#
 # Wet: niets wordt ooit verwijderd.
 # Klaar = J → item zakt naar sectie KLAAR onderaan.
 # Mandaat Continu = J → altijd actief, geen tijdslimiet.

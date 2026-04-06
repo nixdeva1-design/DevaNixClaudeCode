@@ -130,6 +130,30 @@ Elke term heeft één precieze betekenis. Geen overlap. Geen aanname.
 Cuiper is niet een naam maar een Object. Alles erft uit Cuiper.
 Alle namen beginnen met Cuiper in CuiperCamelCase (PascalCase).
 
+### Canonieke erfenis-hiërarchie
+
+```
+Cuiper                               ← Object, nr=1, souverein, anker
+└── CuiperCore                       ← fundamentele laag (crates/cuiper-core/)
+      ├── CuiperBacklogPlanner.sh    ← script erft van CuiperCore
+      ├── CuiperListener.sh          ← script erft van CuiperCore
+      ├── cuiper-router              ← crate erft van CuiperCore
+      ├── CuiperServices.nix         ← module erft van CuiperCore
+      └── CuiperClaudeCodeTakenlijst ← register erft van CuiperCore
+            ├── CuiperBacklogOperator     ← mandaat erft van Takenlijst
+            │     └── CuiperBacklogPlanner.sh  ← implementatie
+            ├── CuiperTrailLogOperator    ← mandaat erft van Takenlijst
+            ├── CuiperKlaarMeldingOperator← mandaat erft van Takenlijst
+            │     └── CuiperKlaarMelding.sh
+            ├── CuiperCommitPushOperator  ← mandaat erft van Takenlijst
+            ├── CuiperDevNulVerbodOperator← mandaat erft van Takenlijst
+            └── CuiperBacklogOpschoener  ← mandaat erft van Takenlijst
+```
+
+Wet: niets erft direct van Cuiper — altijd via CuiperCore.
+Zonder CuiperCore als tussenlaag is een component een wees: niet traceerbaar,
+niet gesedimenteerd, niet onderdeel van de hive.
+
 ```
 shell script   → CuiperSteward.sh
 nix module     → CuiperServices.nix

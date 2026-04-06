@@ -46,10 +46,12 @@ CREATE TABLE IF NOT EXISTS cuiper_hive_component (
     ulid            TEXT        PRIMARY KEY,
     naam            TEXT        NOT NULL,
     type            TEXT        NOT NULL,
-      -- script | nix-module | rust-crate | sql-schema | config | ontologie
+      -- script | nix-module | rust-crate | sql-schema | config | ontologie | register | mandaat
     pad             TEXT,                       -- bestandspad relatief aan repo root
     beschrijving    TEXT,
     eigenaar_hive_nr INTEGER    REFERENCES cuiper_hive_lid(hive_nr),
+    erft_van        TEXT        REFERENCES cuiper_hive_component(ulid),
+      -- ontologische ouder — via welke laag erft dit component van Cuiper
     status          TEXT        DEFAULT 'actief',
     aangemaakt_stap INTEGER,                    -- CuiperStapNr waarop aangemaakt
     aangemaakt      BIGINT      NOT NULL,
@@ -118,7 +120,62 @@ VALUES
  'Centrale config. Alle scripts sourcen dit. Geen hardcoded paden.',                     1, 33, 0, 0),
 ('01COMP015ONTOLOGIE000000', 'CuiperHiveCoreOntologie','sql-schema','ontologie/CuiperHiveCoreOntologie.sql',
  'Levende kaart van het hive: leden, componenten, verbindingen, traces.',                1, 34, 0, 0)
+-- Ontbrekende componenten stap 35-38
+,('01COMP016ROUTER000000000', 'cuiper-router',           'rust-crate','crates/cuiper-router/',
+ 'Namespace-gebaseerde signaal routing. Airgap isolatie. Brug-mechanisme voor cross-namespace.', 1, 36, 0, 0),
+('01COMP017JAEGERSPAN000000', 'CuiperJaegerSpan',        'script',   'scripts/protocol/CuiperJaegerSpan.sh',
+ 'Gedeelde Jaeger OTLP span sender. Gebruikt door Listener en Counter.',                    3, 35, 0, 0),
+('01COMP018TAKENLIJST00000', 'CuiperClaudeCodeTakenlijst','register','backlog/CuiperClaudeCodeTakenlijst.md',
+ 'Register van continue mandaten van CuiperHiveNr 3. Erft van CuiperCore.',                3, 37, 0, 0),
+('01COMP019BACKLOGOP000000', 'CuiperBacklogOperator',    'mandaat',  NULL,
+ 'Mandaat: status/prioriteit wijzigen, items toevoegen, niets verwijderen.',                3, 37, 0, 0),
+('01COMP020TRAILLOGOP00000', 'CuiperTrailLogOperator',   'mandaat',  NULL,
+ 'Mandaat: trail log schrijven na elke respons naar logs/trail/.',                          3, 37, 0, 0),
+('01COMP021KLAARMELOP00000', 'CuiperKlaarMeldingOperator','mandaat', NULL,
+ 'Mandaat: CuiperKlaarMelding.sh uitvoeren als verplichte afsluiting.',                    3, 37, 0, 0),
+('01COMP022COMMITPUOP00000', 'CuiperCommitPushOperator', 'mandaat',  NULL,
+ 'Mandaat: elke stap committen en pushen naar remote. 4x retry backoff.',                  3, 37, 0, 0),
+('01COMP023DEVNULOP000000', 'CuiperDevNulVerbodOperator','mandaat',  NULL,
+ 'Mandaat: /dev/null verbod handhaven. Fouten naar trail, nooit onderdrukt.',              3, 37, 0, 0),
+('01COMP024OPSCHOON000000', 'CuiperBacklogOpschoener',   'mandaat',  NULL,
+ 'Mandaat: foute statussen corrigeren zonder opdracht. Dubbele IDs sedimenteren.',         3, 37, 0, 0)
 ON CONFLICT (ulid) DO NOTHING;
+
+-- ─── erft_van relaties — ontologische keten ──────────────────────────────────
+-- Wet: alles erft via CuiperCore (01COMP011CORE), niet direct van Cuiper.
+-- Cuiper → CuiperCore → [component] → [sub-component]
+
+UPDATE cuiper_hive_component SET erft_van = '01COMP011CORE00000000000'
+WHERE ulid IN (
+    '01COMP001LISTENER000000000',
+    '01COMP002COUNTER0000000000',
+    '01COMP003KLAAR00000000000',
+    '01COMP004BACKLOG000000000',
+    '01COMP005STEWARD000000000',
+    '01COMP006SENTINEL00000000',
+    '01COMP007PORTS00000000000',
+    '01COMP008SERVICES0000000',
+    '01COMP009DATABASES000000',
+    '01COMP010JAEGER00000000',
+    '01COMP012DATALOG0000000',
+    '01COMP013BUS000000000000',
+    '01COMP014CONFIG000000000',
+    '01COMP015ONTOLOGIE000000',
+    '01COMP016ROUTER000000000',
+    '01COMP017JAEGERSPAN000000',
+    '01COMP018TAKENLIJST00000'
+);
+
+-- CuiperClaudeCodeTakenlijst → CuiperBacklog* operators
+UPDATE cuiper_hive_component SET erft_van = '01COMP018TAKENLIJST00000'
+WHERE ulid IN (
+    '01COMP019BACKLOGOP000000',
+    '01COMP020TRAILLOGOP00000',
+    '01COMP021KLAARMELOP00000',
+    '01COMP022COMMITPUOP00000',
+    '01COMP023DEVNULOP000000',
+    '01COMP024OPSCHOON000000'
+);
 
 -- ─── Verbindingen — CuiperListener is verbonden aan alles ────────────────────
 
@@ -128,5 +185,13 @@ VALUES
 ('01VBND002', '01COMP001LISTENER000000000', '01COMP014CONFIG000000000', 'configureert','Leest CUIPER_JAEGER_OTLP_URL',  0),
 ('01VBND003', '01COMP002COUNTER0000000000', '01COMP001LISTENER000000000','roept-aan',  'Counter triggert listener via stop hook', 0),
 ('01VBND004', '01COMP011CORE00000000000',   '01COMP012DATALOG0000000',  'gebruikt',   'Core types gebruikt door datalog engine', 0),
-('01VBND005', '01COMP013BUS000000000000',   '01COMP011CORE00000000000', 'gebruikt',   'Bus gebruikt core CuiperSignaal types', 0)
+('01VBND005', '01COMP013BUS000000000000',   '01COMP011CORE00000000000', 'gebruikt',   'Bus gebruikt core CuiperSignaal types', 0),
+('01VBND006', '01COMP016ROUTER000000000',  '01COMP011CORE00000000000', 'gebruikt',   'Router gebruikt CuiperCuip + CuiperBewaker uit core', 0),
+('01VBND007', '01COMP016ROUTER000000000',  '01COMP013BUS000000000000', 'gebruikt',   'Router werkt op CuiperSignaal van bus', 0),
+('01VBND008', '01COMP002COUNTER0000000000','01COMP017JAEGERSPAN000000','roept-aan',  'Counter stuurt span via CuiperJaegerSpan.sh', 0),
+('01VBND009', '01COMP001LISTENER000000000','01COMP017JAEGERSPAN000000','roept-aan',  'Listener stuurt span via CuiperJaegerSpan.sh', 0),
+('01VBND010', '01COMP019BACKLOGOP000000',  '01COMP004BACKLOG000000',  'implementeert','CuiperBacklogOperator wordt uitgevoerd via BacklogPlanner', 0),
+('01VBND011', '01COMP021KLAARMELOP00000',  '01COMP003KLAAR00000000000','implementeert','CuiperKlaarMeldingOperator wordt uitgevoerd via KlaarMelding', 0),
+('01VBND012', '01COMP020TRAILLOGOP00000',  '01COMP001LISTENER000000000','bewaakt',   'TrailLogOperator bewaakt dat Listener trail schrijft', 0),
+('01VBND013', '01COMP023DEVNULOP000000',   '01COMP002COUNTER0000000000','bewaakt',  'DevNulVerbodOperator bewaakt Counter op /dev/null gebruik', 0)
 ON CONFLICT (ulid) DO NOTHING;
