@@ -1,0 +1,47 @@
+# CuiperBacklog
+# Branch: claude/linux-usb-dual-boot-Hsk67
+# Geen /dev/null — alle taken worden gesedimenteerd
+# Aangemaakt: CuiperStapNr 30 — ULID: 01JWQNM6K8P9RXWN5LD3HBCDS4T
+
+## Formaat
+
+| ID | Status | Prioriteit | Taak | StapNr | ULID |
+|----|--------|------------|------|--------|------|
+
+Status: OPEN | BEZIG | KLAAR | GEBLOKKEERD | GESEDIMENTEERD
+Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
+
+## Backlog
+
+| ID | Status | Prioriteit | Taak | StapNr | ULID |
+|----|--------|------------|------|--------|------|
+| 01JWQN01 | OPEN | KRITIEK | Rust workspace aanmaken (cuiper-core crate) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN02 | OPEN | KRITIEK | Datalog/Prolog inferentie engine in Rust | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN03 | OPEN | KRITIEK | OpenCog Hyperon NixOS module | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN04 | OPEN | HOOG | CuiperNginx.nix poorten via CuiperPorts.nix | 20 | 01JWQN3K7P8RXWV2LD4HBCDS7N |
+| 01JWQN05 | OPEN | HOOG | API gateway module (CuiperApiGateway.nix) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN06 | OPEN | HOOG | CuiperHeader definitie in code bestanden | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
+| 01JWQN07 | OPEN | HOOG | Cuip stub implementatie | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
+| 01JWQN08 | OPEN | HOOG | GNN pipeline (Neo4j → training data) | 23 | 01JWQN9K5R8PXWV2LD4HBCDS7N |
+| 01JWQN09 | OPEN | HOOG | NixOS installatie op USB (stap 3) | 8 | 01JWQMK8P3N6RXVW4LD7YCBHS2 |
+| 01JWQN10 | OPEN | MEDIUM | CuiperDatabases.nix MongoDB btrfs waarschuwing oplossen | 19 | 01JWQN28R5P9SXWV4KD7HBCDT6 |
+| 01JWQN11 | OPEN | MEDIUM | CuiperServices.nix Kafka KRaft modus (geen Zookeeper) | 19 | 01JWQN28R5P9SXWV4KD7HBCDT6 |
+| 01JWQN12 | OPEN | MEDIUM | MindsDB als NixOS service volledig configureren | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN13 | OPEN | MEDIUM | MLflow PostgreSQL database aanmaken in init script | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN14 | OPEN | MEDIUM | Ubuntu ISO met VSCodium + Ollama configureren | 5 | 01JWQMH2K9P6RYVN5LD4WBCXT7 |
+| 01JWQN15 | OPEN | MEDIUM | CuiperOerOntologie SQL laden in PostgreSQL bij boot | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
+| 01JWQN16 | OPEN | MEDIUM | Rust crate bus-core (Zenoh wrapper + namespace traits) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN17 | OPEN | MEDIUM | Rust crate namespace-guard (isolatie enforcer) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN18 | OPEN | MEDIUM | Rust crate router (signaal routing engine) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN19 | OPEN | LAAG | Pro abonnement opzeggen (dinsdag) | 7 | 01JWQMV4R6P8NXWQ2KD5YCBHT3 |
+| 01JWQN20 | OPEN | LAAG | Kali Linux op USB testen via Ventoy GRUB2 modus | 2 | 01JWQM8K4N2X7RVHP3FD9QCBT5 |
+| 01JWQN21 | OPEN | LAAG | CuiperConnect.sh VPN certificaten configureren | 15 | 01JWQMW6X4P7RVWN3KE8HBCDS2 |
+| 01JWQN22 | OPEN | LAAG | Tauri + React CuiperDashboard bouwen | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN23 | OPEN | LAAG | Blender als CuiperEntiteit in ontologie registreren | 27 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN24 | KLAAR | HOOG | Ventoy + Ubuntu + Kali op USB | 2 | 01JWQM8K4N2X7RVHP3FD9QCBT5 |
+| 01JWQN25 | KLAAR | HOOG | CuiperPorts.nix centrale poortregistry | 19 | 01JWQN28R5P9SXWV4KD7HBCDT6 |
+| 01JWQN26 | KLAAR | HOOG | CuiperOerOntologie SQL schema | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
+| 01JWQN27 | KLAAR | HOOG | CuiperSentinel + CuiperSteward | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
+| 01JWQN28 | KLAAR | HOOG | Machine laag + gedeelde LSP Neovim/VSCodium | 28 | 01JWQNJ2K6P8RXWN4LD7HBCDS9M |
+| 01JWQN29 | KLAAR | MEDIUM | Guest scripts CuiperAgent/CuiperDrop | 10 | 01JWQMN9R5P7SXWV4KE2HBCDT8 |
+| 01JWQN30 | KLAAR | MEDIUM | CuiperCamelCase hernoeming | 25 | 01JWQND4K7P8RXWN5LD2HBCDS6T |
