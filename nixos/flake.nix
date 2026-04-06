@@ -26,13 +26,13 @@
       nixosConfigurations.reparatie-usb = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./modules/ports.nix
-          ./modules/system.nix
-          ./modules/desktop.nix
-          ./modules/services.nix
-          ./modules/databases.nix
-          ./modules/dev.nix
-          ./modules/nginx.nix
+          ./modules/CuiperPorts.nix
+          ./modules/CuiperSystem.nix
+          ./modules/CuiperDesktop.nix
+          ./modules/CuiperServices.nix
+          ./modules/CuiperDatabases.nix
+          ./modules/CuiperDev.nix
+          ./modules/CuiperNginx.nix
 
           # Home Manager als module zodat het mee rebuildt
           home-manager.nixosModules.home-manager {

@@ -49,10 +49,10 @@ controleer_ontwerpen() {
     ["nixos/db/001_port_conflict_registry.sql"]="Poort conflict kennisdb"
     ["nixos/db/002_cuiper_oer_ontologie.sql"]="Ontologie SQL schema"
     ["nixos/flake.nix"]="NixOS flake"
-    ["nixos/modules/ports.nix"]="Centrale poortregistry"
-    ["scripts/protocol/ulid.sh"]="ULID generator"
-    ["scripts/protocol/log.sh"]="Trail logger"
-    ["scripts/protocol/verify.sh"]="Markov verificatie"
+    ["nixos/modules/CuiperPorts.nix"]="Centrale poortregistry"
+    ["scripts/protocol/CuiperUlid.sh"]="ULID generator"
+    ["scripts/protocol/CuiperLog.sh"]="Trail logger"
+    ["scripts/protocol/CuiperVerify.sh"]="Markov verificatie"
   )
 
   log "Ontwerpen controleren..."
@@ -100,7 +100,7 @@ Type:            SESSIE_OPEN
 Commit:          ${COMMIT}
 Branch:          ${BRANCH}
 Steward:         actief
-Sentinel:        $(pgrep -f sentinel.sh > /dev/null && echo "actief" || echo "niet actief")
+Sentinel:        $(pgrep -f CuiperSentinel.sh > /dev/null && echo "actief" || echo "niet actief")
 EOF
 
   echo "STEWARD_ULID=${ULID}" > "${REPO}/.steward_sessie"

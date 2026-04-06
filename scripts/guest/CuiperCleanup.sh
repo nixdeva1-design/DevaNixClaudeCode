@@ -20,7 +20,7 @@ echo "Hash: ${CONSENT_HASH}"
 
 # Eerst relay — data veiligstellen
 echo "Data terugsturen naar hoofdnode..."
-bash "${SCRIPT_DIR}/relay.sh"
+bash "${SCRIPT_DIR}/CuiperRelay.sh"
 
 # Verbindingen sluiten
 if [ -n "$ZENOH_PID" ]; then

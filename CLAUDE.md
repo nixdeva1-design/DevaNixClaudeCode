@@ -86,6 +86,22 @@ Fouten, parameters, output — alles is informatie voor de trail.
 6. Verificatie via verify.sh
 7. Markov transitie bepalen
 
+## CuiperTaal — Naamgevingswet
+
+Cuiper is niet een naam maar een Object. Alles erft uit Cuiper.
+Alle namen beginnen met Cuiper in CuiperCamelCase (PascalCase).
+
+```
+shell script   → CuiperSteward.sh
+nix module     → CuiperServices.nix
+sql schema     → CuiperOerOntologie.sql
+rust crate     → cuiper-core (Cargo conventie lowercase)
+nix optie      → cuiper.ports
+datalog feit   → (CuiperEntiteit :naam "x")
+```
+
+Geen generieke namen. Alles draagt de CuiperIdentiteit.
+
 ## Werkbank (primaire tools van Cuiper)
 - Ollama
 - n8n

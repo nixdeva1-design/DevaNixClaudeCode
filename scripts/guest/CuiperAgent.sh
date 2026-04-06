@@ -120,9 +120,9 @@ echo ""
 
 # Standaard sequentie — agent stuurt dit altijd
 # Cuiper bepaalt wanneer agent gestart wordt
-voer_uit "diagnose"  "${SCRIPT_DIR}/diagnose.sh"
-voer_uit "connect"   "${SCRIPT_DIR}/connect.sh"  "$HOOFDNODE_IP"
-voer_uit "listener"  "${SCRIPT_DIR}/listener.sh"
+voer_uit "diagnose"  "${SCRIPT_DIR}/CuiperDiagnose.sh"
+voer_uit "connect"   "${SCRIPT_DIR}/CuiperConnect.sh"  "$HOOFDNODE_IP"
+voer_uit "listener"  "${SCRIPT_DIR}/CuiperListener.sh"
 
 echo ""
 echo "Agent sequentie klaar. Trail geschreven naar: ${LOGDIR}"

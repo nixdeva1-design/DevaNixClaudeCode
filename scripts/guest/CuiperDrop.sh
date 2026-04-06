@@ -12,22 +12,22 @@ geval() { true; }
 
 case "$CMD" in
   consent)
-    bash "${SCRIPT_DIR}/consent.sh" "$@"
+    bash "${SCRIPT_DIR}/CuiperConsent.sh" "$@"
     ;;
   diagnose)
-    bash "${SCRIPT_DIR}/diagnose.sh" "$@"
+    bash "${SCRIPT_DIR}/CuiperDiagnose.sh" "$@"
     ;;
   connect)
-    bash "${SCRIPT_DIR}/connect.sh" "$@"
+    bash "${SCRIPT_DIR}/CuiperConnect.sh" "$@"
     ;;
   listener)
-    bash "${SCRIPT_DIR}/listener.sh" "$@"
+    bash "${SCRIPT_DIR}/CuiperListener.sh" "$@"
     ;;
   relay)
-    bash "${SCRIPT_DIR}/relay.sh" "$@"
+    bash "${SCRIPT_DIR}/CuiperRelay.sh" "$@"
     ;;
   cleanup)
-    bash "${SCRIPT_DIR}/cleanup.sh" "$@"
+    bash "${SCRIPT_DIR}/CuiperCleanup.sh" "$@"
     ;;
   *)
     echo "CuiperHive Reparatie Gereedschap"

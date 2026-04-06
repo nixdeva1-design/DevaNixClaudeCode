@@ -5,7 +5,7 @@
 
 set -e
 
-ULID=$(bash "$(dirname "$0")/ulid.sh")
+ULID=$(bash "$(dirname "$0")/CuiperUlid.sh")
 TS=$(date +%s)
 VOLGNR="${1}"
 HIVENR="${2}"

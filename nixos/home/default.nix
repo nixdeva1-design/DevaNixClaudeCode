@@ -72,10 +72,10 @@
       update  = "nix flake update /home/reparateur/.config/nixos";
 
       # Klant werkplek (gescheiden van lab)
-      nieuw-klant    = "/home/reparateur/.config/nixos/scripts/nieuwe-klant.sh";
+      nieuw-klant    = "/home/reparateur/.config/nixos/scripts/CuiperNieuweKlant.sh";
 
       # Lab project (gescheiden van klanten)
-      nieuw-project  = "/home/reparateur/.config/nixos/scripts/nieuw-lab-project.sh";
+      nieuw-project  = "/home/reparateur/.config/nixos/scripts/CuiperNieuwLabProject.sh";
 
       # Services
       db    = "pgcli -U reparateur";
@@ -83,9 +83,9 @@
       n8n   = "xdg-open http://localhost:5678";
 
       # Snapshots / debug
-      snap       = "/home/reparateur/.config/nixos/scripts/snapshot.sh maak";
-      snaps      = "/home/reparateur/.config/nixos/scripts/snapshot.sh lijst";
-      herstel    = "/home/reparateur/.config/nixos/scripts/snapshot.sh herstel";
+      snap       = "/home/reparateur/.config/nixos/scripts/CuiperSnapshot.sh maak";
+      snaps      = "/home/reparateur/.config/nixos/scripts/CuiperSnapshot.sh lijst";
+      herstel    = "/home/reparateur/.config/nixos/scripts/CuiperSnapshot.sh herstel";
 
       # Air-gap test omgeving
       airgap     = "cd /airgap/tests";
