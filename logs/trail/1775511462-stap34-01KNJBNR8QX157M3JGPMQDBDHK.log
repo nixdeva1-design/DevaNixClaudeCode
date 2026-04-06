@@ -22,4 +22,4 @@ Plan:                  1. CuiperListener.sh — exec + Jaeger OTLP HTTP + trail 
 CuiperStatusBackup34:  99bb301 — stap 33, geen listener, geen tracing, geen Cuip type
 CuiperVerwachtBackup34: listener actief, Jaeger ontvangt spans, CuiperCuip bruikbaar in Rust
 Rollbackpunt:          99bb301
-CuiperNaVerwachtBackup34: pending
+CuiperNaVerwachtBackup34: 61a149c gepusht — C == B, transitie geslaagd
