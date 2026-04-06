@@ -80,8 +80,30 @@ Alle versies bewaard in database.
 Macro:   netwerk topologie   → modules als nodes
 Meso:    module topologie    → bestanden als nodes
 Micro:   bestand topologie   → regels als nodes
-Nano:    regel topologie     → tokens als nodes (toekomst)
+Nano:    regel topologie     → tokens als nodes
+Sub-nano: machine laag       → bytes, mnemonics, hex als nodes
 ```
+
+## Machine Laag
+
+Elke machine instructie is een CuiperEntiteit.
+Elke hex byte is een potentiële Cuip.
+De ontologie gaat tot op dit niveau.
+
+```
+CuiperMachineLaag
+├── Assembler     NASM, FASM — mnemonics als entiteiten
+├── C / C++       systeem laag, driver niveau
+├── Fortran       numeriek, wetenschappelijk
+├── Pascal        Free Pascal, Delphi compatibel
+├── Hex           binaire inspectie, radare2
+└── Rust          vervangt C op systeem niveau
+```
+
+Editor compatibiliteit:
+Neovim en VSCodium delen dezelfde LSP servers.
+Eén LSP server = één bron van waarheid voor beide editors.
+Overstap tussen editors zonder configuratieverlies.
 
 Elk niveau heeft dezelfde ontologie. Zelfgelijkend.
 

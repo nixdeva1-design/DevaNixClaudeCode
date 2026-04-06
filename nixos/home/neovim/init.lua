@@ -65,6 +65,35 @@ lspconfig.lua_ls.setup({
   },
 })
 
+-- C / C++ (gedeeld met VSCodium via clangd)
+lspconfig.clangd.setup({
+  capabilities = capabilities,
+  cmd = { "clangd", "--background-index", "--clang-tidy" },
+})
+
+-- Nix (gedeeld met VSCodium via nil)
+lspconfig.nil_ls.setup({ capabilities = capabilities })
+
+-- TypeScript / JavaScript
+lspconfig.tsserver.setup({ capabilities = capabilities })
+
+-- Assembler (NASM/FASM)
+lspconfig.asm_lsp.setup({ capabilities = capabilities })
+
+-- Fortran
+lspconfig.fortls.setup({ capabilities = capabilities })
+
+-- ─── Hex viewer integratie ───────────────────────────────────────────────────
+-- xxd hex mode: open binair bestand als hex
+vim.api.nvim_create_autocmd("BufReadPre", {
+  pattern = "*.bin,*.o,*.so,*.exe",
+  callback = function()
+    vim.opt_local.binary = true
+  end,
+})
+vim.keymap.set("n", "<leader>hx", ":%!xxd<CR>",    { desc = "Hex weergave aan" })
+vim.keymap.set("n", "<leader>hb", ":%!xxd -r<CR>", { desc = "Hex weergave uit" })
+
 -- LSP keymaps
 vim.keymap.set("n", "gd",  vim.lsp.buf.definition,     { desc = "Ga naar definitie" })
 vim.keymap.set("n", "gr",  vim.lsp.buf.references,      { desc = "Referenties" })
