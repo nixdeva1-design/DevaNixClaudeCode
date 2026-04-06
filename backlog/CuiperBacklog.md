@@ -30,7 +30,7 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 | 01JWQN13 | OPEN | MEDIUM | MLflow PostgreSQL database aanmaken in init script | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN14 | OPEN | MEDIUM | Ubuntu ISO met VSCodium + Ollama configureren | 5 | 01JWQMH2K9P6RYVN5LD4WBCXT7 |
 | 01JWQN15 | OPEN | MEDIUM | CuiperOerOntologie SQL laden in PostgreSQL bij boot | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
-| 01JWQN16 | OPEN | MEDIUM | Rust crate bus-core (Zenoh wrapper + namespace traits) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
+| 01JWQN16 | KLAAR | MEDIUM | Rust crate bus-core (Zenoh wrapper + namespace traits) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN17 | OPEN | MEDIUM | Rust crate namespace-guard (isolatie enforcer) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN18 | OPEN | MEDIUM | Rust crate router (signaal routing engine) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN19 | OPEN | LAAG | Pro abonnement opzeggen (dinsdag) | 7 | 01JWQMV4R6P8NXWQ2KD5YCBHT3 |
