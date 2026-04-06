@@ -35,6 +35,9 @@
     ruby.enable     = false;
   };
 
+  # ─── Tracing ──────────────────────────────────────────────────────────
+  cuiper.jaeger.enable = true;
+
   # ─── Nginx — proxy voor alle actieve services ──────────────────────────
   cuiper.nginx.enable = true;
 }

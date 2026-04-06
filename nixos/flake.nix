@@ -32,6 +32,7 @@
         ./modules/CuiperNginx.nix
         ./modules/CuiperDev.nix
         ./modules/CuiperHyperon.nix
+        ./modules/CuiperJaeger.nix
 
         home-manager.nixosModules.home-manager
         {

@@ -1,0 +1,25 @@
+ULID:                  01KNJBNR8QX157M3JGPMQDBDHK
+UnixTimestamp:         1775511462
+CuiperStapNr:          34
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/linux-usb-dual-boot-Hsk67
+Vraagprompt:           CuiperListener+Jaeger, CuiperHiveCoreOntologie, CuiperBewaker, CuiperCuip/Cuip stub
+Redenering:            1. Listener ontbrak — CLAUDE.md verwees ernaar maar het bestond niet.
+                       2. Jaeger tracing maakt elke uitvoering zichtbaar en traceerbaar.
+                       3. CuiperHiveCoreOntologie = levende kaart van het hive zelf (niet de Oer).
+                       4. CuiperBewaker past Cuiper3Markov toe op runtime:
+                          geen dubbele uitvoering, geen oneindige loops, geen corrupte data.
+                       5. CuiperCuip = ontwerpeenheid: ULID+timestamp+regelnr+CAN.
+                          De Cuip declareert potentie vóór uitvoering, registreert uitkomst erna.
+Antwoordprompt:        Alle vijf componenten gebouwd en vastgelegd.
+Plan:                  1. CuiperListener.sh — exec + Jaeger OTLP HTTP + trail log + Markov
+                       2. CuiperJaeger.nix — NixOS module, all-in-one, badger storage
+                       3. CuiperPorts.nix — Jaeger poorten toegevoegd
+                       4. CuiperHiveCoreOntologie.sql — leden, componenten, verbindingen, traces
+                       5. crates/cuiper-core/src/cuip.rs — CuiperCuip + CuipWaarde + cuip! macro
+                       6. crates/cuiper-core/src/bewaker.rs — CuiperBewaker
+                       7. lib.rs update
+CuiperStatusBackup34:  99bb301 — stap 33, geen listener, geen tracing, geen Cuip type
+CuiperVerwachtBackup34: listener actief, Jaeger ontvangt spans, CuiperCuip bruikbaar in Rust
+Rollbackpunt:          99bb301
+CuiperNaVerwachtBackup34: pending

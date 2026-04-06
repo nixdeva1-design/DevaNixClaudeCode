@@ -88,6 +88,18 @@
     php-fpm  = 9001;     # NIET 9000 — conflict met ClickHouse native
     ruby-dev = 3002;     # NIET 3000 — conflict overal
 
+    # ─── Distributed tracing — Jaeger / OTLP ─────────────────
+    jaeger = {
+      agent-compact  = 6831;   # UDP — Thrift compact (agent ingang)
+      agent-binary   = 6832;   # UDP — Thrift binary (agent ingang)
+      collector-http = 14268;  # HTTP — Thrift collector
+      collector-grpc = 14250;  # gRPC — model.proto collector
+      otlp-http      = 4318;   # OTLP HTTP — gebruikt door CuiperListener.sh
+      otlp-grpc      = 4317;   # OTLP gRPC
+      ui             = 16686;  # Jaeger UI (browser)
+      zipkin         = 9411;   # Zipkin compatible ingang
+    };
+
     # ─── Beheer ───────────────────────────────────────────────
     ssh = 22;
   };
