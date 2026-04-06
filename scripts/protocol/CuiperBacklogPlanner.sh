@@ -12,11 +12,16 @@
 
 set -e
 
-REPO="/home/user/DevaNixClaudeCode"
-BACKLOG_DIR="${REPO}/backlog"
+# ─── Centrale config — geen hardcoded paden ───────────────────────────────
+_PLANNER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_PLANNER_DIR/../../CuiperConfig.env"
+unset _PLANNER_DIR
+
+REPO="$CUIPER_REPO"
+BACKLOG_DIR="$CUIPER_BACKLOG_DIR"
 BACKLOG_FILE="${BACKLOG_DIR}/CuiperBacklog.md"
-LOGDIR="${REPO}/logs/trail"
-BRANCH="claude/linux-usb-dual-boot-Hsk67"
+LOGDIR="$CUIPER_TRAIL_DIR"
+BRANCH="$CUIPER_BRANCH"
 
 mkdir -p "$BACKLOG_DIR"
 

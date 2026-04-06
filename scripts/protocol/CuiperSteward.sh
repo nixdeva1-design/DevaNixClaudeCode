@@ -13,9 +13,14 @@
 
 set -e
 
-REPO="/home/user/DevaNixClaudeCode"
-LOGDIR="${REPO}/logs/trail"
-BRANCH="claude/linux-usb-dual-boot-Hsk67"
+# ─── Centrale config — geen hardcoded paden ───────────────────────────────
+_STEWARD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_STEWARD_DIR/../../CuiperConfig.env"
+unset _STEWARD_DIR
+
+REPO="$CUIPER_REPO"
+LOGDIR="$CUIPER_TRAIL_DIR"
+BRANCH="$CUIPER_BRANCH"
 
 mkdir -p "$LOGDIR"
 

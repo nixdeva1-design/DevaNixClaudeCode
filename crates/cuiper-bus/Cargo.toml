@@ -1,0 +1,16 @@
+[package]
+name        = "cuiper-bus"
+description = "CuiperHive Zenoh signaalbus wrapper met namespace isolatie"
+version.workspace    = true
+edition.workspace    = true
+authors.workspace    = true
+license.workspace    = true
+repository.workspace = true
+
+[dependencies]
+cuiper-core = { path = "../cuiper-core" }
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+thiserror   = { workspace = true }
+tracing     = { workspace = true }
+tokio       = { workspace = true }

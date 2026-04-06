@@ -1,133 +1,117 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
+
+let
+  cfg   = config.cuiper.services;
+  ports = config.cuiper.ports;
+in
 
 {
-  # ─── Nginx reverse proxy ──────────────────────────────────────────────────
-  # Één ingang voor alle services
-  # Internet → Nginx → interne services
-  # Niets is direct bereikbaar van buiten
+  # ─── Nginx enable optie ───────────────────────────────────────────────────
+  options.cuiper.nginx.enable = lib.mkEnableOption "Nginx reverse proxy";
 
-  services.nginx = {
-    enable = true;
+  config = lib.mkIf config.cuiper.nginx.enable {
 
-    # Aanbevolen instellingen
-    recommendedGzipSettings  = true;
-    recommendedOptimisation  = true;
-    recommendedProxySettings = true;
-    recommendedTlsSettings   = true;
+    services.nginx = {
+      enable = true;
 
-    # ─── Logging — geen /dev/null ──────────────────────────────────
-    appendHttpConfig = ''
-      log_format cuiper '$remote_addr [$time_local] '
-                        '"$request" $status $body_bytes_sent '
-                        '"$http_referer" "$http_user_agent" '
-                        'upstream=$upstream_addr';
+      recommendedGzipSettings  = true;
+      recommendedOptimisation  = true;
+      recommendedProxySettings = true;
+      recommendedTlsSettings   = true;
 
-      access_log /data/logs/nginx/access.log cuiper;
-      error_log  /data/logs/nginx/error.log  warn;
-    '';
+      # ─── Logging — geen /dev/null ────────────────────────────────────
+      appendHttpConfig = ''
+        log_format cuiper '$remote_addr [$time_local] '
+                          '"$request" $status $body_bytes_sent '
+                          '"$http_referer" "$http_user_agent" '
+                          'upstream=$upstream_addr';
 
-    # ─── Virtual hosts ─────────────────────────────────────────────
-    virtualHosts = {
+        access_log /data/logs/nginx/access.log cuiper;
+        error_log  /data/logs/nginx/error.log  warn;
+      '';
 
-      # Gitea — zelf-gehoste git
-      "gitea.localhost" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:3000";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-          '';
-        };
-      };
+      # ─── Virtual hosts — conditioneel op welke services actief zijn ──
+      virtualHosts = lib.mkMerge [
 
-      # n8n — workflow automatisering
-      "n8n.localhost" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:5678";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-          '';
-        };
-      };
+        (lib.mkIf cfg.gitea.enable {
+          "gitea.localhost" = {
+            listen    = [{ addr = "0.0.0.0"; port = 80; }];
+            locations."/" = {
+              proxyPass       = "http://127.0.0.1:${toString ports.gitea}";
+              proxyWebsockets = true;
+            };
+          };
+        })
 
-      # Grafana — BI dashboards
-      "grafana.localhost" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:3100";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-          '';
-        };
-      };
+        (lib.mkIf cfg.n8n.enable {
+          "n8n.localhost" = {
+            listen    = [{ addr = "0.0.0.0"; port = 80; }];
+            locations."/" = {
+              proxyPass       = "http://127.0.0.1:${toString ports.n8n}";
+              proxyWebsockets = true;
+            };
+          };
+        })
 
-      # Ollama API
-      "ollama.localhost" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:11434";
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            # Grote responses voor model output
-            proxy_read_timeout 300s;
-            proxy_buffering off;
-          '';
-        };
-      };
+        (lib.mkIf cfg.grafana.enable {
+          "grafana.localhost" = {
+            listen    = [{ addr = "0.0.0.0"; port = 80; }];
+            locations."/" = {
+              proxyPass       = "http://127.0.0.1:${toString ports.grafana}";
+              proxyWebsockets = true;
+            };
+          };
+        })
 
-      # MindsDB
-      "mindsdb.localhost" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:47334";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-          '';
-        };
-      };
+        (lib.mkIf cfg.ollama.enable {
+          "ollama.localhost" = {
+            listen    = [{ addr = "0.0.0.0"; port = 80; }];
+            locations."/" = {
+              proxyPass = "http://127.0.0.1:${toString ports.ollama}";
+              extraConfig = ''
+                proxy_read_timeout 300s;
+                proxy_buffering off;
+              '';
+            };
+          };
+        })
 
-      # API gateway — extern toegangspunt
-      "api.localhost" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:8080";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-          '';
-        };
-      };
+        (lib.mkIf cfg.mindsdb.enable {
+          "mindsdb.localhost" = {
+            listen    = [{ addr = "0.0.0.0"; port = 80; }];
+            locations."/" = {
+              proxyPass       = "http://127.0.0.1:${toString ports.mindsdb.http}";
+              proxyWebsockets = true;
+            };
+          };
+        })
+
+        (lib.mkIf cfg.mlflow.enable {
+          "mlflow.localhost" = {
+            listen    = [{ addr = "0.0.0.0"; port = 80; }];
+            locations."/" = {
+              proxyPass = "http://127.0.0.1:${toString ports.mlflow}";
+            };
+          };
+        })
+
+      ];
+
+      # ─── Zenoh TCP passthrough via stream proxy ─────────────────────
+      streamConfig = lib.mkIf cfg.zenoh.enable ''
+        server {
+          listen ${toString ports.zenoh};
+          proxy_pass 127.0.0.1:${toString ports.zenoh};
+          proxy_timeout 3600s;
+          proxy_connect_timeout 10s;
+          access_log /data/logs/nginx/zenoh-stream.log;
+        }
+      '';
     };
+
+    systemd.tmpfiles.rules = [
+      "d /data/logs       0755 nginx nginx -"
+      "d /data/logs/nginx 0755 nginx nginx -"
+    ];
   };
-
-  # ─── Zenoh TCP passthrough via stream proxy ────────────────────────────────
-  # Nginx stream module voor Zenoh op poort 7447
-  services.nginx.streamConfig = ''
-    server {
-      listen 7447;
-      proxy_pass 127.0.0.1:7447;
-      proxy_timeout 3600s;
-      proxy_connect_timeout 10s;
-      access_log /data/logs/nginx/zenoh-stream.log;
-    }
-  '';
-
-  # ─── Log map aanmaken ─────────────────────────────────────────────────────
-  systemd.tmpfiles.rules = [
-    "d /data/logs         0755 nginx nginx -"
-    "d /data/logs/nginx   0755 nginx nginx -"
-  ];
-
-  # Firewall poorten worden centraal beheerd in system.nix
 }

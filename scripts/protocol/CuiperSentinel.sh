@@ -7,8 +7,13 @@
 
 set -e
 
-REPO="/home/user/DevaNixClaudeCode"
-LOGDIR="${REPO}/logs/trail"
+# ─── Centrale config — geen hardcoded paden ───────────────────────────────
+_SENTINEL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_SENTINEL_DIR/../../CuiperConfig.env"
+unset _SENTINEL_DIR
+
+REPO="$CUIPER_REPO"
+LOGDIR="$CUIPER_TRAIL_DIR"
 INTERVAL=30  # seconden tussen checks
 
 mkdir -p "$LOGDIR"

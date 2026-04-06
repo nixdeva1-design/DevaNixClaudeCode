@@ -1,5 +1,5 @@
 {
-  description = "Reparatie USB - NixOS werkplek";
+  description = "CuiperHive — modulaire NixOS werkplek";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,27 +21,53 @@
         overlays = [ rust-overlay.overlays.default ];
         config.allowUnfree = true;
       };
-    in {
-      # Systeem configuratie (NixOS)
-      nixosConfigurations.reparatie-usb = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          ./modules/CuiperPorts.nix
-          ./modules/CuiperSystem.nix
-          ./modules/CuiperDesktop.nix
-          ./modules/CuiperServices.nix
-          ./modules/CuiperDatabases.nix
-          ./modules/CuiperDev.nix
-          ./modules/CuiperNginx.nix
 
-          # Home Manager als module zodat het mee rebuildt
-          home-manager.nixosModules.home-manager {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.reparateur = import ./home/default.nix;
-            home-manager.extraSpecialArgs = { inherit rust-overlay; };
-          }
-        ];
+      # ─── Basismodules — altijd geladen ──────────────────────────────────
+      basisModules = [
+        ./modules/CuiperPorts.nix
+        ./modules/CuiperSystem.nix
+        ./modules/CuiperDesktop.nix
+        ./modules/CuiperServices.nix
+        ./modules/CuiperDatabases.nix
+        ./modules/CuiperNginx.nix
+        ./modules/CuiperDev.nix
+        ./modules/CuiperHyperon.nix
+
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs       = true;
+          home-manager.useUserPackages     = true;
+          home-manager.users.reparateur    = import ./home/default.nix;
+          home-manager.extraSpecialArgs    = { inherit rust-overlay; };
+        }
+      ];
+
+      # ─── Helper: bouw een CuiperHive systeem met klantprofiel ───────────
+      # Gebruik: mkCuiperSystem ./clients/acme.nix
+      mkCuiperSystem = klantProfiel:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = basisModules ++ [ klantProfiel ];
+        };
+
+    in {
+
+      # ─── Klantprofielen ─────────────────────────────────────────────────
+      # nixos-rebuild switch --flake .#<naam>
+
+      nixosConfigurations = {
+
+        # Volledige installatie — alle services aan
+        standaard = mkCuiperSystem ./clients/standaard.nix;
+
+        # AI/ML focus — Ollama, MindsDB, MLflow, Neo4j
+        ai-werkstation = mkCuiperSystem ./clients/ai-werkstation.nix;
+
+        # Minimaal — alleen PostgreSQL + Gitea + Redis
+        minimal = mkCuiperSystem ./clients/minimal.nix;
+
+        # Achterwaartse compatibiliteit met oude naam
+        reparatie-usb = mkCuiperSystem ./clients/standaard.nix;
       };
     };
 }

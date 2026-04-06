@@ -18,7 +18,10 @@ STATUS_N="${8}"
 VERWACHT_N="${9}"
 ROLLBACK="${10}"
 
-LOGDIR="/home/user/DevaNixClaudeCode/logs/trail"
+_LOG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LOG_DIR/../../CuiperConfig.env"
+unset _LOG_DIR
+LOGDIR="$CUIPER_TRAIL_DIR"
 mkdir -p "$LOGDIR"
 
 LOGFILE="${LOGDIR}/${TS}-${ULID}.log"
@@ -28,7 +31,7 @@ ULID:                    ${ULID}
 UnixTimestamp:           ${TS}
 Volgnr:                  ${VOLGNR}
 Met:                     CuiperHiveNr ${HIVENR} — ${HIENAAM}
-Hive:                    claude/linux-usb-dual-boot-Hsk67
+Hive:                    ${CUIPER_BRANCH}
 Vraagprompt:             ${VRAAG}
 Redenering:              ${REDENERING}
 Antwoordprompt:          ${ANTWOORD}

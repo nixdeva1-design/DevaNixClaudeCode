@@ -42,7 +42,10 @@ else
   sed -i "s/CuiperNaVerwachtBackup:  PENDING/CuiperNaVerwachtBackup:  ${NARESULTAAT} — MISMATCH — rollback naar ${ROLLBACK_COMMIT}/" "$LOGFILE"
 
   # Rollback uitvoeren
-  git -C /home/user/DevaNixClaudeCode checkout "${ROLLBACK_COMMIT}" -- .
+  _VERIFY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  source "$_VERIFY_DIR/../../CuiperConfig.env"
+  unset _VERIFY_DIR
+  git -C "$CUIPER_REPO" checkout "${ROLLBACK_COMMIT}" -- .
   echo "STATUS: ROLLBACK uitgevoerd naar ${ROLLBACK_COMMIT}"
 fi
 

@@ -1,0 +1,14 @@
+# Klantspecifieke lokale config — niet committen
+CuiperConfig.local.env
+
+# Rust build artefacten
+target/
+Cargo.lock
+
+# Steward sessie state
+.steward_sessie
+
+# Editor
+.vscode/
+*.swp
+*~
