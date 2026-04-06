@@ -86,6 +86,32 @@ Fouten, parameters, output — alles is informatie voor de trail.
 6. Verificatie via verify.sh
 7. Markov transitie bepalen
 
+## CuiperVocabulaire — Wat ik bedoel als ik dit zeg
+
+Elke term heeft één precieze betekenis. Geen overlap. Geen aanname.
+
+| Term | Wat ik feitelijk doe | Externe state? | Overleeft sessie-einde? |
+|------|----------------------|----------------|------------------------|
+| **Redeneren** | Tekst genereren intern. Nooit zichtbaar tenzij ik het schrijf in mijn response. | Nee | Nee |
+| **Ontwerpen** | Een plan formuleren als tekst in mijn response. Bestaat alleen in het gesprek. | Nee | Nee |
+| **Lezen** | Read/Grep/Glob/Bash uitvoeren om bestanden of git output te bekijken. Read-only. | Nee | Nee |
+| **Schrijven** | Write/Edit tool: bestand aanmaken of wijzigen op lokale disk. | Lokale disk | Nee (tot commit) |
+| **Committen** | `git commit` uitvoeren. Staat vastgelegd in lokale git history. NIET op remote. | Lokale git | Nee (tot push) |
+| **Pushen** | `git push` uitvoeren. Staat op remote branch. Overleeft sessie-einde en crashes. | Remote | Ja |
+| **Vastleggen** | logs/trail/ schrijven + committen + pushen. Volledige cyclus. Niets minder. | Remote | Ja |
+| **Bouwen** | Schrijven + testen + verificeren. Impliceert NIET automatisch committen of pushen. | Lokale disk | Nee (tot commit) |
+| **Plannen** | Een stap toevoegen aan TodoWrite of CuiperBacklog. Niet hetzelfde als uitvoeren. | Context/backlog | Nee |
+| **Testen** | Verificatiecommando uitvoeren, output lezen. Geen state wijziging. | Nee | Nee |
+| **Verificeren** | CuiperVerify.sh uitvoeren, Markov C bepalen (C==B of rollback). | Nee | Nee |
+| **Activeren** | Service of script starten via systemctl/bash. OS runtime state wijzigt. | OS runtime | Tot reboot |
+| **Deployen** | Activeren op productiesysteem na verificatie. | OS + extern | Ja |
+
+**Kritieke distincties:**
+- Ontwerpen ≠ Schrijven. Een plan in tekst is GEEN bestand.
+- Schrijven ≠ Committen. Een bestand op disk is NIET in git.
+- Committen ≠ Pushen. Een lokale commit is NIET op remote.
+- Vastleggen = alle drie: schrijven + committen + pushen.
+
 ## CuiperTaal — Naamgevingswet
 
 Cuiper is niet een naam maar een Object. Alles erft uit Cuiper.
@@ -101,6 +127,55 @@ datalog feit   → (CuiperEntiteit :naam "x")
 ```
 
 Geen generieke namen. Alles draagt de CuiperIdentiteit.
+
+## CuiperAntifragielProtocol
+
+Elke storing levert informatie op. Informatie wordt gesedimenteerd.
+Het systeem wordt sterker van elke fout, niet ondanks fouten.
+
+### Bekende zandkorrels en hun respons
+
+| Storing | Detectie | Automatische respons | Sedimentatie |
+|---------|----------|----------------------|-------------|
+| Context limiet zonder waarschuwing | SESSIE_EINDE log + drempel-miss | Drempel bijgesteld via history.txt | history.txt +1 datapunt → betere voorspelling |
+| Netwerk fout bij push | git push exit ≠ 0 | Retry 4x: 2s, 4s, 8s, 16s backoff | Trail log: PUSH_FOUT met tijdstip |
+| CuiperStapNr commit vergeten | Stop hook: untracked logs/trail/ | CuiperPromptCounter auto-commit trail | Commit gelogd in git history |
+| Branch divergentie | git push rejected (non-fast-forward) | fetch + rebase, nooit force push | Trail log: DIVERGENTIE |
+| CuiperPromptCounter zelf faalt | exit code ≠ 0 | Luid falen naar stderr, nooit stil | Trail log: HOOK_FOUT |
+| `bc` niet geïnstalleerd | command not found | awk fallback voor alle rekenwerk | Geen, awk is altijd aanwezig |
+| SESSIE_OPEN log ontbreekt | ls leeg resultaat | Fallback naar laatste bekende drempel | Trail log: DREMPEL_FALLBACK |
+| MCP server disconnect | tool call geweigerd | Log disconnect, doorgaan zonder GitHub | Trail log: MCP_DISCONNECT |
+| Counter file corrupt | parse error op count | Reset naar 0, log als COUNTER_RESET | Trail log: COUNTER_RESET |
+| Sessie onderbroken voor push | Stop hook blokkeert | Auto-commit + push bij volgende respons | Niets gaat verloren |
+
+### CuiperContextDrempelProtocol
+
+De context limiet waarschuwing is DYNAMISCH, nooit een vaste waarde.
+
+```
+Algoritme:
+  history = logs/trail/prompt_session_history.txt  (één getal per regel = stappen per sessie)
+  avg     = gemiddelde van history (of 21 als history leeg is)
+  drempel_zacht = avg * 0.80  → waarschuw, nog geen blokkade
+  drempel_hard  = avg * 0.95  → blokkeer, forceer sessie-afsluitplan
+
+Bij sessie-einde (context limiet bereikt):
+  schrijf huidige stapnr naar history → verrijkt volgende berekening
+  sessie 1: 21 stappen → avg=21, drempel_zacht=17, drempel_hard=20
+  sessie 2+: herberekend na elke sessie
+```
+
+**Elke context limiet hit = betere voorspelling volgende keer.**
+
+### CuiperAutoVastlegProtocol
+
+Elke respons van ClaudeCode (CuiperHiveNr 3) verplicht:
+1. Trail log schrijven naar logs/trail/
+2. CuiperPromptCounter.sh auto-commit + push van logs/trail/
+3. Bij drempel_zacht: waarschuwing in response zichtbaar
+4. Bij drempel_hard: blokkade + verplicht sessie-afsluitplan
+
+Geen stap mag onvastgelegd blijven. Elke stap = een commit op remote.
 
 ## Werkbank (primaire tools van Cuiper)
 - Ollama

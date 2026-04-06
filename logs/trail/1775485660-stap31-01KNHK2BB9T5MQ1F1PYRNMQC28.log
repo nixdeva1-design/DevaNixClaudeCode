@@ -1,0 +1,19 @@
+ULID:                  01KNHK2BB9T5MQ1F1PYRNMQC28
+UnixTimestamp:         1775485660
+CuiperStapNr:          31
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/linux-usb-dual-boot-Hsk67
+Vraagprompt:           Bouw prompt-counter protocol, antifragiel protocol, vocabulaire definitie
+Redenering:            Vorige sessie eindigde zonder waarschuwing. Oorzaak: geen teller,
+                       geen dynamische drempel, geen auto-vastleg mechanisme.
+                       Oplossing: CuiperPromptCounter.sh + project-level hook + CLAUDE.md uitbreiding.
+Antwoordprompt:        Alle vier componenten gebouwd en vastgelegd.
+Plan:                  1. CuiperVocabulaire in CLAUDE.md
+                       2. CuiperAntifragielProtocol in CLAUDE.md
+                       3. scripts/protocol/CuiperPromptCounter.sh
+                       4. .claude/settings.json project hook
+                       5. Commit + push
+CuiperStatusBackup31:  c5e2901 — stap 30 actief, geen counter, geen hook, vaste drempel
+CuiperVerwachtBackup31: dynamische drempel actief, elke respons auto-vastgelegd
+Rollbackpunt:          c5e2901
+CuiperNaVerwachtBackup31: pending
