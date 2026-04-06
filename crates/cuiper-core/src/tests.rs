@@ -186,3 +186,90 @@ mod entiteit_tests {
         assert_ne!(CuiperHiveNr::DEVA, CuiperHiveNr::CLAUDE_CLI);
     }
 }
+
+#[cfg(test)]
+mod donut_tests {
+    use crate::cuip::CuipWaarde;
+    use crate::donut::{CuiperDonut, CUIPER_WAARDEN, CUIPER_NORMEN, CUIPER_WETTEN};
+
+    // Minimale component die CuiperDonut implementeert
+    struct CuiperTestComponent {
+        naam: &'static str,
+        ulid: &'static str,
+    }
+    impl CuiperDonut for CuiperTestComponent {
+        fn cuiper_naam(&self) -> &str { self.naam }
+        fn cuiper_ulid(&self) -> &str { self.ulid }
+    }
+
+    #[test]
+    fn waarden_normen_wetten_zijn_gevuld() {
+        let c = CuiperTestComponent { naam: "CuiperTestComponent", ulid: "01TEST" };
+        assert!(!c.waarden().is_empty());
+        assert!(!c.normen().is_empty());
+        assert!(!c.wetten().is_empty());
+    }
+
+    #[test]
+    fn geweten_staat_geldige_actie_toe() {
+        let c = CuiperTestComponent { naam: "CuiperTestComponent", ulid: "01TEST" };
+        assert!(c.geweten("git commit -m 'CuiperStap40'").is_ok());
+    }
+
+    #[test]
+    fn geweten_blokkeert_dev_null() {
+        let c = CuiperTestComponent { naam: "CuiperTestComponent", ulid: "01TEST" };
+        let fout = c.geweten("echo fout 2>/dev/null").unwrap_err();
+        assert!(fout.to_string().contains("/dev/null verbod"));
+    }
+
+    #[test]
+    fn geweten_blokkeert_naam_zonder_cuiper_prefix() {
+        // Component met naam die wet schendt
+        let wees = CuiperTestComponent { naam: "BacklogOperator", ulid: "01WEES" };
+        let fout = wees.geweten("willekeurige actie").unwrap_err();
+        assert!(fout.to_string().contains("Cuiper prefix"));
+    }
+
+    #[test]
+    fn passeer_ring_geeft_voltooid_bij_geldig() {
+        let c = CuiperTestComponent { naam: "CuiperTestComponent", ulid: "01TEST" };
+        assert!(matches!(c.passeer_ring("git push"), CuipWaarde::Voltooid));
+    }
+
+    #[test]
+    fn passeer_ring_geeft_mislukt_bij_wet_schending() {
+        let c = CuiperTestComponent { naam: "CuiperTestComponent", ulid: "01TEST" };
+        assert!(matches!(
+            c.passeer_ring("rm output 2>/dev/null"),
+            CuipWaarde::Mislukt(_)
+        ));
+    }
+
+    #[test]
+    fn wet_schending_is_nooit_stil() {
+        // WetSchending implementeert Display — altijd leesbaar, nooit weggegooid
+        let c = CuiperTestComponent { naam: "CuiperTestComponent", ulid: "01TEST" };
+        let schending = c.geweten("bad 2>/dev/null").unwrap_err();
+        let tekst = schending.to_string();
+        assert!(!tekst.is_empty());
+        assert!(tekst.contains("WetSchending"));
+    }
+
+    #[test]
+    fn waarden_bevatten_wijsheid_en_logica() {
+        assert!(CUIPER_WAARDEN.contains(&"wijsheid"));
+        assert!(CUIPER_WAARDEN.contains(&"radicale logica"));
+    }
+
+    #[test]
+    fn wetten_bevatten_dev_null_verbod_en_naamgevingswet() {
+        assert!(CUIPER_WETTEN.iter().any(|w| w.contains("/dev/null verbod")));
+        assert!(CUIPER_WETTEN.iter().any(|w| w.contains("CuiperNaamgevingswet")));
+    }
+
+    #[test]
+    fn normen_bevatten_sedimentatie() {
+        assert!(CUIPER_NORMEN.iter().any(|n| n.contains("gesedimenteerd")));
+    }
+}

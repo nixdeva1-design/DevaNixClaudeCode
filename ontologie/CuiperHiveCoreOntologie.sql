@@ -120,7 +120,11 @@ VALUES
  'Centrale config. Alle scripts sourcen dit. Geen hardcoded paden.',                     1, 33, 0, 0),
 ('01COMP015ONTOLOGIE000000', 'CuiperHiveCoreOntologie','sql-schema','ontologie/CuiperHiveCoreOntologie.sql',
  'Levende kaart van het hive: leden, componenten, verbindingen, traces.',                1, 34, 0, 0)
--- Ontbrekende componenten stap 35-38
+-- CuiperDonut — de erfenis-methode, onderdeel van CuiperCore
+,('01COMP000DONUT0000000000', 'CuiperDonut', 'rust-module', 'crates/cuiper-core/src/donut.rs',
+ 'De erfenis-vector. Alle waarden, normen, wetten en het geweten. '
+ 'Elk component erft via CuiperDonut. CAN → Voltooid|Mislukt via passeer_ring().', 1, 39, 0, 0)
+-- Ontbrekende componenten stap 35-39
 ,('01COMP016ROUTER000000000', 'cuiper-router',           'rust-crate','crates/cuiper-router/',
  'Namespace-gebaseerde signaal routing. Airgap isolatie. Brug-mechanisme voor cross-namespace.', 1, 36, 0, 0),
 ('01COMP017JAEGERSPAN000000', 'CuiperJaegerSpan',        'script',   'scripts/protocol/CuiperJaegerSpan.sh',
@@ -142,10 +146,15 @@ VALUES
 ON CONFLICT (ulid) DO NOTHING;
 
 -- ─── erft_van relaties — ontologische keten ──────────────────────────────────
--- Wet: alles erft via CuiperCore (01COMP011CORE), niet direct van Cuiper.
--- Cuiper → CuiperCore → [component] → [sub-component]
+-- Wet: alles erft via CuiperCore → CuiperDonut, niet direct van Cuiper.
+-- Cuiper → CuiperCore → CuiperDonut → [component] → [sub-component]
 
+-- CuiperDonut erft van CuiperCore
 UPDATE cuiper_hive_component SET erft_van = '01COMP011CORE00000000000'
+WHERE ulid = '01COMP000DONUT0000000000';
+
+-- Alle overige componenten erven via CuiperDonut
+UPDATE cuiper_hive_component SET erft_van = '01COMP000DONUT0000000000'
 WHERE ulid IN (
     '01COMP001LISTENER000000000',
     '01COMP002COUNTER0000000000',

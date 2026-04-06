@@ -134,25 +134,31 @@ Alle namen beginnen met Cuiper in CuiperCamelCase (PascalCase).
 
 ```
 Cuiper                               ← Object, nr=1, souverein, anker
-└── CuiperCore                       ← fundamentele laag (crates/cuiper-core/)
-      ├── CuiperBacklogPlanner.sh    ← script erft van CuiperCore
-      ├── CuiperListener.sh          ← script erft van CuiperCore
-      ├── cuiper-router              ← crate erft van CuiperCore
-      ├── CuiperServices.nix         ← module erft van CuiperCore
-      └── CuiperClaudeCodeTakenlijst ← register erft van CuiperCore
-            ├── CuiperBacklogOperator     ← mandaat erft van Takenlijst
-            │     └── CuiperBacklogPlanner.sh  ← implementatie
-            ├── CuiperTrailLogOperator    ← mandaat erft van Takenlijst
-            ├── CuiperKlaarMeldingOperator← mandaat erft van Takenlijst
-            │     └── CuiperKlaarMelding.sh
-            ├── CuiperCommitPushOperator  ← mandaat erft van Takenlijst
-            ├── CuiperDevNulVerbodOperator← mandaat erft van Takenlijst
-            └── CuiperBacklogOpschoener  ← mandaat erft van Takenlijst
+└── CuiperCore                       ← alle vaste zaken: waarden, normen, wetten, geweten
+      └── CuiperDonut                ← de erfenis-methode (donut.rs)
+            │  waarden / normen / wetten / geweten / passeer_ring()
+            │  De ring: CAN → Voltooid | Mislukt — nooit omzeild
+            │
+            ├── CuiperBacklogPlanner.sh    ← erft via CuiperDonut
+            ├── CuiperListener.sh          ← erft via CuiperDonut
+            ├── cuiper-router              ← erft via CuiperDonut
+            ├── CuiperServices.nix         ← erft via CuiperDonut
+            └── CuiperClaudeCodeTakenlijst ← erft via CuiperDonut
+                  ├── CuiperBacklogOperator     ← erft van Takenlijst
+                  │     └── CuiperBacklogPlanner.sh
+                  ├── CuiperTrailLogOperator    ← erft van Takenlijst
+                  ├── CuiperKlaarMeldingOperator← erft van Takenlijst
+                  │     └── CuiperKlaarMelding.sh
+                  ├── CuiperCommitPushOperator  ← erft van Takenlijst
+                  ├── CuiperDevNulVerbodOperator← erft van Takenlijst
+                  └── CuiperBacklogOpschoener   ← erft van Takenlijst
 ```
 
-Wet: niets erft direct van Cuiper — altijd via CuiperCore.
-Zonder CuiperCore als tussenlaag is een component een wees: niet traceerbaar,
-niet gesedimenteerd, niet onderdeel van de hive.
+Wetten:
+- Niets erft direct van Cuiper — altijd via CuiperCore → CuiperDonut.
+- CuiperCore bevat: alle vaste waarden, normen, wetten en het geweten.
+- CuiperDonut is de methode: elke actie passeert de ring via `passeer_ring()`.
+- Zonder CuiperDonut als tussenlaag: component is een wees, wet is niet afdwingbaar.
 
 ```
 shell script   → CuiperSteward.sh

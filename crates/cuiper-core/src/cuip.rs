@@ -62,6 +62,7 @@ impl CuiperCuip {
     ///
     /// # Voorbeeld
     /// ```rust
+    /// use cuiper_core::CuiperCuip;
     /// let cuip = CuiperCuip::nieuw("01KN...".into(), line!(), "query database");
     /// ```
     pub fn nieuw(ulid: String, regelnr: u32, omschrijving: impl Into<String>) -> Self {

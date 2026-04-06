@@ -13,6 +13,7 @@
 
 pub mod bewaker;
 pub mod cuip;
+pub mod donut;
 pub mod entiteit;
 pub mod hive;
 pub mod mandaat;
@@ -22,6 +23,7 @@ mod tests;
 
 pub use bewaker::{CuiperBewaker, CuiperBewakeringsFout};
 pub use cuip::{CuiperCuip, CuipWaarde};
+pub use donut::{CuiperDonut, WetSchending, CUIPER_NORMEN, CUIPER_WAARDEN, CUIPER_WETTEN};
 pub use entiteit::{CuiperEntiteit, CuiperHiveNr};
 pub use hive::CuiperHive;
 pub use mandaat::CuiperMandaat;
