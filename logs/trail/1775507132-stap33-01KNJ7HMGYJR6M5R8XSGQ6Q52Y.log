@@ -24,4 +24,4 @@ Plan:                  1. CuiperConfig.env — centrale config, sourced door all
 CuiperStatusBackup33:  6694ecd — stap 32, hardcoded paden, geen modulaire NixOS, geen Rust
 CuiperVerwachtBackup33: alle paden via CuiperConfig.env, NixOS fully modular, Rust workspace actief
 Rollbackpunt:          6694ecd
-CuiperNaVerwachtBackup33: pending
+CuiperNaVerwachtBackup33: 38e5830 gepusht — C == B, transitie geslaagd
