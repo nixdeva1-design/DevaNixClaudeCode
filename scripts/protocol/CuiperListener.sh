@@ -45,61 +45,17 @@ log_fout() {
     echo "CUIPER LISTENER FOUT [$CONTEXT]: $BERICHT" >&2
 }
 
-# ─── Jaeger OTLP HTTP span sturen ────────────────────────────────────────────
-# Gebruikt OTLP HTTP (poort 4318) — geen afhankelijkheid op Thrift
+# ─── Jaeger span sturen via gedeeld CuiperJaegerSpan.sh ─────────────────────
 jaeger_span() {
-    local TRACE_ID="$1"   # 32 hex tekens
-    local SPAN_ID="$2"    # 16 hex tekens
-    local NAAM="$3"
-    local START_NS="$4"   # nanoseconden
-    local EIND_NS="$5"    # nanoseconden
-    local STATUS_CODE="$6" # 1=OK 2=ERROR
-    local STAP_NR="$7"
-    local EXIT_CODE="$8"
-
-    local JAEGER_URL="${CUIPER_JAEGER_OTLP_URL:-http://127.0.0.1:4318}/v1/traces"
-
-    local PAYLOAD
-    PAYLOAD=$(cat <<EOF
-{
-  "resourceSpans": [{
-    "resource": {
-      "attributes": [
-        {"key": "service.name",    "value": {"stringValue": "cuiper-hive"}},
-        {"key": "service.version", "value": {"stringValue": "0.1.0"}},
-        {"key": "cuiper.namespace","value": {"stringValue": "${CUIPER_NAMESPACE}"}},
-        {"key": "cuiper.client",   "value": {"stringValue": "${CUIPER_CLIENT_ID}"}}
-      ]
-    },
-    "scopeSpans": [{
-      "scope": {"name": "CuiperListener"},
-      "spans": [{
-        "traceId":          "${TRACE_ID}",
-        "spanId":           "${SPAN_ID}",
-        "name":             "${NAAM}",
-        "kind":             2,
-        "startTimeUnixNano":"${START_NS}",
-        "endTimeUnixNano":  "${EIND_NS}",
-        "attributes": [
-          {"key": "cuiper.stap_nr",   "value": {"intValue":    ${STAP_NR}}},
-          {"key": "cuiper.exit_code", "value": {"intValue":    ${EXIT_CODE}}},
-          {"key": "cuiper.branch",    "value": {"stringValue": "${CUIPER_BRANCH}"}}
-        ],
-        "status": {"code": ${STATUS_CODE}}
-      }]
-    }]
-  }]
-}
-EOF
-)
-
-    local CURL_ERR=""
-    if ! CURL_ERR=$(curl -s --max-time 3 -X POST "$JAEGER_URL" \
-        -H "Content-Type: application/json" \
-        -d "$PAYLOAD" 2>&1); then
-        log_fout "JAEGER" "span sturen mislukt (Jaeger niet bereikbaar?): $CURL_ERR"
-        # Geen abort — listener werkt ook zonder Jaeger
-    fi
+    local TRACE_ID="$1" SPAN_ID="$2" NAAM="$3"
+    local START_NS="$4" EIND_NS="$5"
+    local STATUS_CODE="$6" STAP_NR="$7" EXIT_CODE="$8"
+    local START_S="${START_NS%000000000}"
+    local EIND_S="${EIND_NS%000000000}"
+    bash "$_LISTENER_DIR/CuiperJaegerSpan.sh" \
+        --trace "$TRACE_ID" --span "$SPAN_ID" --naam "$NAAM" \
+        --start "$START_S" --eind "$EIND_S" \
+        --status "$STATUS_CODE" --stap "$STAP_NR" --exit "$EXIT_CODE"
 }
 
 # ─── Hex genereren voor trace/span IDs ───────────────────────────────────────

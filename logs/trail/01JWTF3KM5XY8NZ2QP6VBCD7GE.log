@@ -1,0 +1,30 @@
+ULID:                  01JWTF3KM5XY8NZ2QP6VBCD7GE
+UnixTimestamp:         1775515945
+CuiperStapNr:          36
+Met:                   CuiperHiveNr 1+2 — Cuiper + Deva
+Hive:                  claude/linux-usb-dual-boot-Hsk67
+Vraagprompt:           Continue from where you left off — audit: stopt zonder waarschuwing
+Redenering:            Sessie was onderbroken door context compaction mid-stap 35.
+                       cuiper-router crate bestond maar was niet toegevoegd aan workspace.
+                       Borrow conflict in router.rs (immutable + mutable borrow in zelfde scope).
+                       Bugfix: past_op() voor /* patroon: prefix stripte /* maar moest enkel * strippen.
+                       15 tests: 14 pass na borrow fix, 1 fail (pas_op ster) → bugfix → 15/15 pass.
+Antwoordprompt:        cuiper-router voltooid: workspace entry + 15 tests groen + brug bugfix
+Plan:                  Stap 36: cuiper-router afronden + commit + push
+CuiperStatusBackup36:  cuiper-router crate bestond maar was NOT in workspace, 8 uncommitted files
+CuiperVerwachtBackup36: cuiper-router in workspace, 15 tests groen, alles committed + pushed
+Rollbackpunt:          6f8d1a5
+
+Wijzigingen stap 36:
+  - Cargo.toml: cuiper-router toegevoegd aan workspace members
+  - crates/cuiper-router/src/lib.rs: mod tests toegevoegd
+  - crates/cuiper-router/src/routeregel.rs: bugfix past_op() /* patroon (prefix len -1 i.p.v. -2)
+  - crates/cuiper-router/src/router.rs: borrow conflict opgelost (clone naam+actie voor log), HashMap import verwijderd
+  - crates/cuiper-router/src/tests.rs: NIEUW — 15 tests (routeregel, brug, router)
+
+Tests resultaat:
+  cuiper-router: 15 passed, 0 failed
+  cuiper-core:   zie stap 35 logs
+  cuiper-datalog: zie stap 35 logs
+
+CuiperNaVerwachtBackup36: C == B — alle 15 tests groen, borrow opgelost, bugfix correct

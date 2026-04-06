@@ -3,6 +3,7 @@ members = [
     "crates/cuiper-core",
     "crates/cuiper-bus",
     "crates/cuiper-datalog",
+    "crates/cuiper-router",
 ]
 resolver = "2"
 

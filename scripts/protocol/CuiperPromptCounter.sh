@@ -110,6 +110,29 @@ elif [ "$COUNT" -ge "$DREMPEL_ZACHT" ]; then
     echo "CUIPER CONTEXT WAARSCHUWING: prompt $COUNT/$DREMPEL_ZACHT (avg=$AVG) — context limiet nadert." >&2
 fi
 
+# ─── Stap 4b: Jaeger span voor deze prompt ───────────────────────────────────
+# Elke prompt = een span in Jaeger, zichtbaar in de UI
+_COUNTER_SPAN_START=$(date +%s)
+_COUNTER_SPAN_ID=$(cat /dev/urandom | tr -dc '0-9a-f' | head -c 16 2>/dev/null || \
+    printf '%016x' $((RANDOM * RANDOM)))
+_COUNTER_TRACE_ID=$(cat /dev/urandom | tr -dc '0-9a-f' | head -c 32 2>/dev/null || \
+    printf '%032x' $((RANDOM * RANDOM * RANDOM)))
+_COUNTER_STATUS=1
+[ "$COUNT" -ge "$DREMPEL_HARD" ] && _COUNTER_STATUS=2
+
+JAEGER_ERR=""
+if ! JAEGER_ERR=$(bash "$(dirname "${BASH_SOURCE[0]}")/CuiperJaegerSpan.sh" \
+    --trace "$_COUNTER_TRACE_ID" \
+    --span  "$_COUNTER_SPAN_ID" \
+    --naam  "CuiperPromptCounter prompt $COUNT" \
+    --start "$_COUNTER_SPAN_START" \
+    --eind  "$(date +%s)" \
+    --status "$_COUNTER_STATUS" \
+    --stap  "$COUNT" \
+    --exit  0 2>&1); then
+    log_fout "JAEGER_COUNTER" "$JAEGER_ERR"
+fi
+
 # ─── Stap 5: Auto-vastleggen trail logs ──────────────────────────────────────
 cd "$REPO_ROOT"
 

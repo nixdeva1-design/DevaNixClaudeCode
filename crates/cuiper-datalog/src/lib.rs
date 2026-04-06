@@ -18,6 +18,8 @@ pub use feit::CuiperFeit;
 pub use regel::CuiperRegel;
 pub use databank::CuiperDatabank;
 pub use motor::CuiperMotor;
+#[cfg(test)]
+mod tests;
 
 use thiserror::Error;
 

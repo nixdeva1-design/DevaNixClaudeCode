@@ -17,6 +17,8 @@ pub mod entiteit;
 pub mod hive;
 pub mod mandaat;
 pub mod markov;
+#[cfg(test)]
+mod tests;
 
 pub use bewaker::{CuiperBewaker, CuiperBewakeringsFout};
 pub use cuip::{CuiperCuip, CuipWaarde};
