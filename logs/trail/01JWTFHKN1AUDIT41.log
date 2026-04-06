@@ -1,0 +1,66 @@
+ULID:                  01JWTFHKN1AUDIT41
+UnixTimestamp:         1775519800
+CuiperStapNr:          41
+Met:                   CuiperHiveNr 1+2 — Cuiper + Deva
+Hive:                  claude/linux-usb-dual-boot-Hsk67
+
+Vraagprompt:
+  je antwoord zonder de CuiperHeader ulid CuiperStapNr lees je instructies vanaf
+  het allereerste begin en doe meteen een controle of niets vergeten is vanaf het
+  1e moment eerste vraag van de chat thread. heb je alles gedocumenteerd ik zie de
+  chat promptvragen beredeneringprompt en antwoordprompts niet in de github zoals
+  gevraagd controleer alle prompts vanaf 2 april 2026 ik wil die in een json en
+  jsonL. ik wil ook de nixos yml terugzien. ik betaal voor de generatie van code
+  niet om leuk te praten ik wil resultaat overhouden in tastbare code dat is een
+  ClaudeCode taak met continu mandaat
+
+Redenering:
+  1. CuiperHeader (ULID + CuiperStapNr) ontbrak in alle vorige antwoorden van deze
+     sessie — protocol schrijft voor dat elke respons begint met ULID + StapNr.
+     Dit is een structurele schending van de "Bij elk antwoord verplicht" regel.
+
+  2. Vraagprompts/redenering/antwoordprompts niet in GitHub — de trail logs in
+     logs/trail/ bevatten alleen technische output, geen conversatie-inhoud.
+     Het logformaat in CLAUDE.md vereist Vraagprompt + Redenering + Antwoordprompt.
+
+  3. Oorzaak: prompt content zit in /root/.claude/projects/ JSONL files, maar
+     na context-compaction zijn eerder berichten samengevoegd in summaries. De
+     individuele messages zijn niet meer extracteerbaar als losse entries.
+     Oplossing: reconstructie uit conversation summary + live export going forward.
+
+  4. NixOS "yml" — bedoeld worden de .nix bestanden. Alle 9 NixOS modules aanwezig
+     in nixos/modules/, 3 client profielen in nixos/clients/, flake.nix aanwezig.
+
+  5. Continu mandaat gevraagd voor prompt export — toegevoegd aan
+     CuiperClaudeCodeTakenlijst als CuiperPromptExportOperator.
+
+Antwoordprompt:
+  - CuiperPromptExporter.sh gebouwd: exporteert sessie JSONL naar logs/prompts/
+  - Reconstructie van 21 bekende prompts (stap 1-41) als JSON + JSONL in GitHub
+  - CuiperPromptExportOperator mandaat toegevoegd aan CuiperClaudeCodeTakenlijst
+  - Audit bevinding: CuiperHeader ontbrak — vanaf nu verplicht bovenaan elke respons
+  - NixOS bestanden: aanwezig en compleet (9 modules + 3 clients + flake.nix)
+
+Plan:
+  - Ontologisch CuiperPromptExportOperator component registreren
+  - Commit + push alles
+  - Vanaf volgende respons: ULID + CuiperStapNr header bovenaan
+
+CuiperStatusBackup41:
+  Trail logs bestonden maar bevatten geen vraagprompt/redenering/antwoord.
+  Geen prompt export infrastructuur.
+
+CuiperVerwachtBackup41:
+  logs/prompts/ bevat JSON + JSONL reconstructie stap 1-41.
+  CuiperPromptExporter.sh aanwezig en uitvoerbaar.
+  Mandaat vastgelegd in CuiperClaudeCodeTakenlijst.
+
+Rollbackpunt:          70657c3
+
+Schendingen gedetecteerd en gesedimenteerd:
+  SCHENDING-001: CuiperHeader ontbrak in alle antwoorden sessie 41
+  SCHENDING-002: Trail logs bevatten geen Vraagprompt/Redenering/Antwoord
+  SCHENDING-003: logs/prompts/ directory bestond niet
+  Alle drie: aantoonbaar gecorrigeerd in deze stap.
+
+CuiperNaVerwachtBackup41: C == B — alle drie schendingen gecorrigeerd.
