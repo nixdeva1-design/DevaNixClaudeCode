@@ -52,8 +52,8 @@ init_backlog() {
 | ID | Status | Prioriteit | Taak | CuiperStapNr | ULID | Aangemaakt |
 \`\`\`
 
-Status: OPEN | BEZIG | KLAAR | GEBLOKKEERD | GESEDIMENTEERD
-Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
+Status: OPEN | BEZIG | KLAAR | GEBLOKKEERD | GESEDIMENTEERD | WEES
+Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG | CuiperIdee
 
 ## Backlog
 
@@ -88,10 +88,15 @@ toon() {
   grep "| GEBLOKKEERD " "$BACKLOG_FILE" || echo "  (geen)"
 
   echo ""
+  echo "── WEES (CuiperIdeeën, niet geïntegreerd) ────────────"
+  grep "| WEES " "$BACKLOG_FILE" || echo "  (geen)"
+
+  echo ""
   echo "── KLAAR (laatste 5) ─────────────────────────────────"
   grep "| KLAAR " "$BACKLOG_FILE" | tail -5 || echo "  (geen)"
 
   echo ""
+  echo "Status: OPEN | BEZIG | KLAAR | GEBLOKKEERD | GESEDIMENTEERD | WEES"
 }
 
 # ─── Taak toevoegen ───────────────────────────────────────────────────────
@@ -213,11 +218,11 @@ status() {
   [ -z "$TAAK_ID" ] && echo "Gebruik: CuiperBacklogPlanner.sh status <id> <OPEN|BEZIG|KLAAR|GEBLOKKEERD>" && exit 1
 
   case "$NIEUW_STATUS" in
-    OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD) ;;
+    OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD|WEES) ;;
     *) echo "Ongeldige status: $NIEUW_STATUS" && exit 1 ;;
   esac
 
-  OUD_STATUS=$(grep "$TAAK_ID" "$BACKLOG_FILE" | grep -oP '(OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD)' | head -1)
+  OUD_STATUS=$(grep "$TAAK_ID" "$BACKLOG_FILE" | grep -oP '(OPEN|BEZIG|KLAAR|GEBLOKKEERD|GESEDIMENTEERD|WEES)' | head -1)
   sed -i "/${TAAK_ID}/s/| ${OUD_STATUS} |/| ${NIEUW_STATUS} |/" "$BACKLOG_FILE"
 
   echo "Status gewijzigd: [${TAAK_ID}] ${OUD_STATUS} → ${NIEUW_STATUS}"
@@ -230,15 +235,16 @@ status() {
 # ─── Samenvatting voor KlaarMelding ──────────────────────────────────────
 samenvatting() {
   init_backlog
-  local KRITIEK HOOG MEDIUM LAAG KLAAR_N TOTAAL_OPEN
+  local KRITIEK HOOG MEDIUM LAAG WEES_N KLAAR_N TOTAAL_OPEN
   KRITIEK=$(grep -c "| OPEN.*KRITIEK\|BEZIG.*KRITIEK\|GEBLOKKEERD.*KRITIEK" "$BACKLOG_FILE" || true)
   HOOG=$(grep -c "| OPEN.*HOOG\|BEZIG.*HOOG\|GEBLOKKEERD.*HOOG" "$BACKLOG_FILE" || true)
   MEDIUM=$(grep -c "| OPEN.*MEDIUM\|BEZIG.*MEDIUM\|GEBLOKKEERD.*MEDIUM" "$BACKLOG_FILE" || true)
   LAAG=$(grep -c "| OPEN.*LAAG\|BEZIG.*LAAG\|GEBLOKKEERD.*LAAG" "$BACKLOG_FILE" || true)
+  WEES_N=$(grep -c "| WEES " "$BACKLOG_FILE" || true)
   KLAAR_N=$(grep -c "| KLAAR " "$BACKLOG_FILE" || true)
   TOTAAL_OPEN=$(( ${KRITIEK:-0} + ${HOOG:-0} + ${MEDIUM:-0} + ${LAAG:-0} ))
-  printf "  KRITIEK: %s  HOOG: %s  MEDIUM: %s  LAAG: %s  (open: %s / klaar: %s)\n" \
-    "${KRITIEK:-0}" "${HOOG:-0}" "${MEDIUM:-0}" "${LAAG:-0}" "$TOTAAL_OPEN" "${KLAAR_N:-0}"
+  printf "  KRITIEK: %s  HOOG: %s  MEDIUM: %s  LAAG: %s  WEES: %s  (open: %s / klaar: %s)\n" \
+    "${KRITIEK:-0}" "${HOOG:-0}" "${MEDIUM:-0}" "${LAAG:-0}" "${WEES_N:-0}" "$TOTAAL_OPEN" "${KLAAR_N:-0}"
 }
 
 # ─── Hoofd ────────────────────────────────────────────────────────────────

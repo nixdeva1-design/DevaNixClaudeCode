@@ -204,3 +204,33 @@ VALUES
 ('01VBND012', '01COMP020TRAILLOGOP00000',  '01COMP001LISTENER000000000','bewaakt',   'TrailLogOperator bewaakt dat Listener trail schrijft', 0),
 ('01VBND013', '01COMP023DEVNULOP000000',   '01COMP002COUNTER0000000000','bewaakt',  'DevNulVerbodOperator bewaakt Counter op /dev/null gebruik', 0)
 ON CONFLICT (ulid) DO NOTHING;
+
+-- ─── CuiperWezen — orphan ideeën zonder ouder-component ──────────────────────
+-- Een Wees heeft nog geen erft_van in de hive-keten.
+-- Status WEES → GEADOPTEERD zodra het idee een parent-component krijgt.
+-- Join: cuiper_wezen.backlog_ulid ↔ CuiperBacklog.md ID kolom
+-- Tijdstempels: unix_ms_server (servertijd ms) + local_time (browser/machine ISO 8601)
+
+CREATE TABLE IF NOT EXISTS cuiper_wezen (
+    ulid            TEXT        PRIMARY KEY,
+    backlog_ulid    TEXT        NOT NULL UNIQUE,
+    tekst           TEXT        NOT NULL,
+    unix_ms_server  BIGINT      NOT NULL,
+    local_time      TEXT,
+    status          TEXT        DEFAULT 'WEES',
+    aangemaakt      BIGINT      NOT NULL
+);
+
+-- ─── CuiperConflicten — dubbele of conflicterende ideeën ─────────────────────
+-- Wanneer ci:: idee al bestaat (zelfde tekst) → conflict hier geregistreerd.
+-- Wet: geen data weggegooid. Beide entries blijven. Conflict is informatie.
+
+CREATE TABLE IF NOT EXISTS cuiper_conflicten (
+    ulid            TEXT        PRIMARY KEY,
+    wezen_ulid      TEXT        REFERENCES cuiper_wezen(ulid),
+    bestaand_ulid   TEXT,
+    tekst           TEXT        NOT NULL,
+    unix_ms         BIGINT      NOT NULL,
+    beschrijving    TEXT        NOT NULL,
+    aangemaakt      BIGINT      NOT NULL
+);

@@ -41,6 +41,29 @@ Criterium voor wat te doen met wat niet werkt:
 7. **Elke respons eindigt met CuiperKlaarMelding** — uitvoer van:
    `bash scripts/protocol/CuiperKlaarMelding.sh <ulid> <stapnr>`
 
+### ci:: / CI:: — CuiperIdee verkorte notitie
+
+Wanneer een bericht begint met `ci::` of `CI::` (hoofdletter-onafhankelijk):
+
+1. Extraheer de tekst na het prefix (alles na `ci::` of `CI::`)
+2. Voer uit: `bash scripts/protocol/CuiperIdee.sh "<tekst>" [--local-time "<ISO>"]`
+3. Het script registreert het idee als WEES in CuiperBacklog + CuiperWezen.jsonl
+4. **ClaudeCode doet verder NIETS met het idee op dat moment**
+5. ClaudeCode herneemt de huidige taak — zoekt CuiperStapNr en ULID op waar gebleven
+6. Als ci:: midden in een taak komt: vermeld de ULID van het geregistreerde idee en ga door
+
+Regels:
+- Een Wees heeft geen ouder-component (geen erft_van) — dit is een bewuste tijdelijke staat
+- Een Wees wordt GEADOPTEERD zodra Cuiper/Deva besluit het te integreren
+- Conflicts (dubbel idee): geregistreerd in logs/wezen/CuiperConflicten.jsonl — geen data verloren
+- Tijdstempels: unix_ms_server (servertijd) + local_time (browser/machine, optioneel meegeven)
+
+Formaat:
+```
+ci:: idee-tekst hier
+ci:: nog een idee --local-time "2026-04-07T23:00:00+02:00"
+```
+
 ### CuiperKlaarMelding — verplichte afsluiting elke respons
 
 De KlaarMelding toont altijd:
