@@ -51,3 +51,4 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 | 01KNJCNGH | OPEN | MEDIUM | Jaeger UI vhost in CuiperNginx.nix (poort 16686) | 35 | 01KNJCN9GH9CPAW7JQ7796EC7J |
 | 01KNJCNGY | OPEN | MEDIUM | n8n werkflow template: Ollama + Zenoh bus koppeling | 35 | 01KNJCN9GYADWES02QME3WAKDW |
 | 01KNJCNH5 | OPEN | HOOG | CuiperHeader definitie in alle code bestanden toepassen | 35 | 01KNJCN9H5BP1YFKSG3YXWNNTT |
+| 01CIPB0EA77R4A3ZSIWG9RK5DYPY3VIMB7LMIG807FYY938B | WEES | CuiperIdee | GNN pipeline koppelen aan Zenoh bus voor realtime graph updates | 62 | 01CIPB0EA77R4A3ZSIWG9RK5DYPY3VIMB7LMIG807FYY938B |
