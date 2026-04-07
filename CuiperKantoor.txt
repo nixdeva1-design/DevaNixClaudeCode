@@ -1,0 +1,67 @@
+CUIPERKANTOOR — ORGANISATIE CONTEXT
+=====================================
+
+EIGENAAR
+  Cuiper (ID=1) — Hoofd Architect & Eigenaar
+  Volledig mandaat over alle systemen, personen en besluiten.
+
+AI SYSTEEMBEHEERDER
+  Deva (ID=2) — Operationeel mandaat namens Cuiper
+  - Beheert alle LLM toegangen en providers
+  - Verwerkt betalingen
+  - Deelt tijdelijke mandaten uit per proces
+  - Bewaakt technische kosten per proces
+
+AI PERSONEEL (ingehuurd)
+  ClaudeCode (ID=3) — Anthropic CLI — niet gratis
+  Claude.ai  (ID=4) — Anthropic Web — niet gratis
+
+KANTOOR PERSONEEL & KLANTEN
+  Personeel: laptop van kantoor
+  Klanten: eigen servers, eigen laptops
+  Toegang via mandaat besluiten — klanten zien geen interne structuur
+
+MANDAAT SYSTEEM
+  Cuiper geeft mandaat aan Deva
+  Deva verstrekt tijdelijke mandaten aan:
+    - Kantoorpersoneel
+    - Klanten (onder voorwaarden)
+    - AI personeel (procesgebonden, tijdelijk)
+  Mandaat bevat: scope, geldig_van, geldig_tot
+
+PROCESKOSTENBEWAKING (Deva)
+  Per proces reizen mee:
+    process_ulid   — unieke ID (ULID formaat)
+    start_unix     — starttijd (Unix seconden)
+    end_unix       — eindtijd (Unix seconden)
+    tokens_used    — tokenverbruik
+  GEEN ruwe valuta bedragen in parameters.
+
+OMGEVINGEN
+  1. Ontwerp    — Cuiper + design-agents, geen productiedata
+  2. Test       — Kantoorpersoneel + implementatie-agents
+  3. Productie  — Hoofd (Deva beheert toegang)
+               — Sub (meerdere, resources: DB, pakketten, systemen)
+
+INFRASTRUCTUUR
+  On-premise : Kantoor eigen servers
+  Cloud      : Microsoft Azure, AWS, Google Cloud (gehuurd)
+  Klanten    : Eigen servers (apart beheerd)
+
+AGENT TYPES
+  Design-agent
+    - Co-ontwerper, GEEN code
+    - Output: 2-3 opties, max 1 A4
+    - Stelt vragen voor ontwerp beslissingen
+
+  Implementatie-agent
+    - Bouwt goedgekeurde ontwerpen
+    - Claimt issue voor start
+    - Werkt op branch: agent/{machine-id}/{issue-nr}
+    - Maakt PR na voltooiing
+
+ZICHTBAARHEID
+  Klanten       — zien alleen hun eigen mandaten en processen
+  Kantoorpersoneel — zien eigen scope
+  Deva          — ziet alle kosten en mandaten
+  Cuiper        — ziet alles

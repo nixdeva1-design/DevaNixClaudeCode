@@ -1,0 +1,19 @@
+{"entity_type":"persoon","id":1,"naam":"Cuiper","rol":"Hoofd Architect & Eigenaar","mandaat":"volledig","kantoor_id":"CuiperKantoor"}
+{"entity_type":"persoon","id":2,"naam":"Deva","rol":"AI Systeembeheerder","mandaat":"operationeel","kantoor_id":"CuiperKantoor"}
+{"entity_type":"ai_personeel","id":3,"naam":"ClaudeCode","provider":"Anthropic","type":"CLI","mandaat_type":"tijdelijk_procesgebonden"}
+{"entity_type":"ai_personeel","id":4,"naam":"Claude.ai","provider":"Anthropic","type":"Web","mandaat_type":"tijdelijk_procesgebonden"}
+{"entity_type":"omgeving","naam":"ontwerp","niveau":1,"data_klasse":"geen_productie"}
+{"entity_type":"omgeving","naam":"test","niveau":2,"data_klasse":"test"}
+{"entity_type":"omgeving","naam":"productie_hoofd","niveau":3,"data_klasse":"productie","beheer":"Deva"}
+{"entity_type":"omgeving","naam":"productie_sub","niveau":3,"data_klasse":"productie","beheer":"Deva","meervoudig":true}
+{"entity_type":"infrastructuur","naam":"kantoor_servers","eigenaar":"CuiperKantoor","type":"on_premise"}
+{"entity_type":"infrastructuur","naam":"cloud_azure","eigenaar":"Microsoft","type":"cloud","gehuurd":true}
+{"entity_type":"infrastructuur","naam":"cloud_aws","eigenaar":"Amazon","type":"cloud","gehuurd":true}
+{"entity_type":"infrastructuur","naam":"cloud_gcp","eigenaar":"Google","type":"cloud","gehuurd":true}
+{"entity_type":"mandaat_regel","van":"Cuiper","via":"Deva","naar":"kantoorpersoneel","voorwaarde":"per_proces"}
+{"entity_type":"mandaat_regel","van":"Cuiper","via":"Deva","naar":"klanten","voorwaarde":"per_proces_beperkt"}
+{"entity_type":"mandaat_regel","van":"Cuiper","via":"Deva","naar":"ai_personeel","voorwaarde":"tijdelijk_procesgebonden"}
+{"entity_type":"proces_schema","veld":"process_ulid","type":"string","formaat":"ULID"}
+{"entity_type":"proces_schema","veld":"start_unix","type":"integer","formaat":"unix_timestamp_seconden"}
+{"entity_type":"proces_schema","veld":"end_unix","type":"integer","formaat":"unix_timestamp_seconden"}
+{"entity_type":"proces_schema","veld":"tokens_used","type":"integer","formaat":"aantal"}
