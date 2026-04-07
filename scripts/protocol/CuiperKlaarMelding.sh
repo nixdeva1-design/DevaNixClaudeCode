@@ -89,7 +89,12 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  CUIPER KLAAR MELDING"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+# Lees CuiperSessieNr
+SESSIE_NR_FILE="$TRAIL_DIR/CuiperSessieNr.txt"
+SESSIE_NR=$(head -1 "$SESSIE_NR_FILE" 2>/dev/null | tr -d '[:space:]' || echo "?")
+SESSIE_ULID=$(sed -n '3p' "$SESSIE_NR_FILE" 2>/dev/null | tr -d '[:space:]' || echo "")
 printf "  CuiperStapNr:  %s\n"      "$STAPNR"
+printf "  CuiperSessieNr:%s\n"      "${SESSIE_NR:-?}"
 printf "  ULID:          %s\n"      "$ULID"
 printf "  Commit:        %s\n"      "$COMMIT_HASH"
 printf "  Branch:        %s\n"      "$BRANCH"
