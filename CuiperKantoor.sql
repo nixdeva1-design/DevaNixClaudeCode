@@ -144,40 +144,119 @@ CREATE TABLE IF NOT EXISTS software_producten (
     aangemaakt_op   BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
 );
 
--- Licenties: 1 device per klant per softwareproduct
--- Klant kan het product draaien op eigen device of eigen cloud VM
-CREATE TABLE IF NOT EXISTS licenties (
-    ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
-                            CHECK (is_valid_ulid(ulid)),
-    klant_ulid      TEXT    NOT NULL REFERENCES klanten(ulid),
-    product_ulid    TEXT    NOT NULL REFERENCES software_producten(ulid),
-    device_ulid     TEXT    NOT NULL REFERENCES devices(ulid),
-    geldig_van      BIGINT  NOT NULL,
-    geldig_tot      BIGINT,
-    actief          BOOLEAN NOT NULL DEFAULT TRUE,
+-- Mandaten uitgebreid met type:
+--   toegang  — wie mag wat doen (bestaand)
+--   gedrag   — hoe gedraagt de software zich voor deze eigenaar
+--   proces   — tijdelijk procesgebonden (AI personeel)
+--
+-- gedrag_config (JSONB) bevat de gedragsregels per product per klant/persoon
+-- Klanten zien alleen hun eigen gedrag_config — nooit die van anderen
+ALTER TABLE mandaten
+    ADD COLUMN IF NOT EXISTS mandaat_type TEXT NOT NULL DEFAULT 'toegang'
+        CHECK (mandaat_type IN ('toegang', 'gedrag', 'proces')),
+    ADD COLUMN IF NOT EXISTS gedrag_config JSONB;
 
-    -- 1 device per klant per product
-    CONSTRAINT uq_licentie_klant_product UNIQUE (klant_ulid, product_ulid)
-);
-
--- Trigger: device moet eigendom zijn van de klant die de licentie heeft
-CREATE OR REPLACE FUNCTION chk_licentie_device_eigenaar()
+-- Gedrag config is verplicht voor type=gedrag
+CREATE OR REPLACE FUNCTION chk_gedrag_config()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM devices
-        WHERE ulid = NEW.device_ulid
-          AND eigenaar_type = 'klant'
-          AND eigenaar_ulid = NEW.klant_ulid
-          AND actief = TRUE
-    ) THEN
+    IF NEW.mandaat_type = 'gedrag' AND NEW.gedrag_config IS NULL THEN
         RAISE EXCEPTION
-            'Device % is geen actief device van klant % of verkeerd eigenaar type',
-            NEW.device_ulid, NEW.klant_ulid;
+            'Mandaat % is type=gedrag maar heeft geen gedrag_config',
+            NEW.ulid;
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_chk_gedrag_config ON mandaten;
+CREATE TRIGGER trg_chk_gedrag_config
+    BEFORE INSERT OR UPDATE ON mandaten
+    FOR EACH ROW EXECUTE FUNCTION chk_gedrag_config();
+
+-- Licenties: zowel personen (personeel) als klanten
+-- eigenaar_type = 'persoon' → kantoorpersoneel, unieke licentie per persoon
+-- eigenaar_type = 'klant'   → klant, 1 device per product
+-- mandaat_ulid  → het gedragsmandaat dat bepaalt hoe software zich gedraagt
+CREATE TABLE IF NOT EXISTS licenties (
+    ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                            CHECK (is_valid_ulid(ulid)),
+    eigenaar_type   TEXT    NOT NULL CHECK (eigenaar_type IN ('persoon', 'klant')),
+    eigenaar_ulid   TEXT    NOT NULL CHECK (is_valid_ulid(eigenaar_ulid)),
+    product_ulid    TEXT    NOT NULL REFERENCES software_producten(ulid),
+    device_ulid     TEXT    NOT NULL REFERENCES devices(ulid),
+    mandaat_ulid    TEXT    NOT NULL REFERENCES mandaten(ulid),  -- gedragsmandaat
+    geldig_van      BIGINT  NOT NULL,
+    geldig_tot      BIGINT,
+    actief          BOOLEAN NOT NULL DEFAULT TRUE,
+
+    -- 1 licentie per eigenaar per product (zowel persoon als klant)
+    CONSTRAINT uq_licentie_eigenaar_product UNIQUE (eigenaar_type, eigenaar_ulid, product_ulid)
+);
+
+-- Trigger: device eigenaar moet overeenkomen met licentie eigenaar
+-- Personeel: device eigenaar_type='kantoor', eigenaar_ulid=persoon.ulid (via mandaat)
+-- Klant:     device eigenaar_type='klant', eigenaar_ulid=klant.ulid
+CREATE OR REPLACE FUNCTION chk_licentie_device_eigenaar()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.eigenaar_type = 'klant' THEN
+        -- Klant: device moet eigendom zijn van die klant
+        IF NOT EXISTS (
+            SELECT 1 FROM devices
+            WHERE ulid = NEW.device_ulid
+              AND eigenaar_type = 'klant'
+              AND eigenaar_ulid = NEW.eigenaar_ulid
+              AND actief = TRUE
+        ) THEN
+            RAISE EXCEPTION
+                'Device % is geen actief device van klant %',
+                NEW.device_ulid, NEW.eigenaar_ulid;
+        END IF;
+    ELSIF NEW.eigenaar_type = 'persoon' THEN
+        -- Personeel: device moet eigendom zijn van kantoor
+        IF NOT EXISTS (
+            SELECT 1 FROM devices
+            WHERE ulid = NEW.device_ulid
+              AND eigenaar_type = 'kantoor'
+              AND actief = TRUE
+        ) THEN
+            RAISE EXCEPTION
+                'Device % is geen actief kantoor device voor persoon %',
+                NEW.device_ulid, NEW.eigenaar_ulid;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger: mandaat op licentie moet type=gedrag zijn
+CREATE OR REPLACE FUNCTION chk_licentie_mandaat_type()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM mandaten
+        WHERE ulid = NEW.mandaat_ulid
+          AND mandaat_type = 'gedrag'
+          AND actief = TRUE
+    ) THEN
+        RAISE EXCEPTION
+            'Licentie % vereist een actief gedragsmandaat, mandaat_ulid: %',
+            NEW.ulid, NEW.mandaat_ulid;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_chk_licentie_device ON licenties;
+CREATE TRIGGER trg_chk_licentie_device
+    BEFORE INSERT OR UPDATE ON licenties
+    FOR EACH ROW EXECUTE FUNCTION chk_licentie_device_eigenaar();
+
+DROP TRIGGER IF EXISTS trg_chk_licentie_mandaat ON licenties;
+CREATE TRIGGER trg_chk_licentie_mandaat
+    BEFORE INSERT OR UPDATE ON licenties
+    FOR EACH ROW EXECUTE FUNCTION chk_licentie_mandaat_type();
 
 DROP TRIGGER IF EXISTS trg_chk_licentie_device ON licenties;
 CREATE TRIGGER trg_chk_licentie_device
