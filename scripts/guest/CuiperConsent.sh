@@ -6,6 +6,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperConsent"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="stdin"
+CUIPER_OUT="file,stdout"
+CUIPER_MODULE_OMSCHRIJVING="Vraagt toestemming van gastgebruiker voor CuiperAgent operaties"
+CUIPER_MODULE_WERKING="Toont wat er uitgevoerd wordt. Wacht op expliciete ja/nee. Logt beslissing."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 CONSENT_LOG="$(dirname "$0")/../../logs/trail/consent.log"
 mkdir -p "$(dirname "$CONSENT_LOG")"
 

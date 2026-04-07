@@ -18,6 +18,20 @@
 
 set -euo pipefail
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperIdee"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args"
+CUIPER_OUT="file"
+CUIPER_MODULE_OMSCHRIJVING="Registreer ci:: ideeen als WEES in CuiperBacklog en CuiperWezen.jsonl"
+CUIPER_MODULE_WERKING="Extraheert tekst na ci:: prefix. Conflicten gesedimenteerd in CuiperConflicten.jsonl."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../CuiperConfig.env" 2>/dev/null || {
     CUIPER_REPO="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"

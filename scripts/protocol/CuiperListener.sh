@@ -18,6 +18,20 @@
 
 set -uo pipefail
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperListener"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args,stdin"
+CUIPER_OUT="trail,stdout"
+CUIPER_MODULE_OMSCHRIJVING="Voert commando uit en registreert uitkomst in trail als Cuip"
+CUIPER_MODULE_WERKING="Wikkelt elke shell-operatie in Cuip CAN/Voltooid/Mislukt. Output naar trail."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 # ─── Centrale config ─────────────────────────────────────────────────────────
 _LISTENER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_LISTENER_DIR/../../CuiperConfig.env"

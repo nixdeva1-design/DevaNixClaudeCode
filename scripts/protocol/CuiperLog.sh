@@ -5,6 +5,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperLog"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args"
+CUIPER_OUT="file"
+CUIPER_MODULE_OMSCHRIJVING="Schrijft gestructureerde trail log naar logs/trail/"
+CUIPER_MODULE_WERKING="Maakt log file aan met ULID, timestamp, Markov staten A/B/C."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 ULID=$(bash "$(dirname "$0")/CuiperUlid.sh")
 TS=$(date +%s)
 VOLGNR="${1}"

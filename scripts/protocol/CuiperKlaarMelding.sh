@@ -7,6 +7,20 @@
 # Gebruik: bash scripts/protocol/CuiperKlaarMelding.sh [ulid] [stapnr]
 set -uo pipefail
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperKlaarMelding"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args"
+CUIPER_OUT="stdout"
+CUIPER_MODULE_OMSCHRIJVING="Verplichte klaar-melding aan het einde van elke ClaudeCode respons"
+CUIPER_MODULE_WERKING="Toont CuiperStapNr, ULID, commit, branch, sessie voortgang, backlog samenvatting."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 REPO_ROOT_ERR=""
 if ! REPO_ROOT=$(git rev-parse --show-toplevel 2>&1); then
     REPO_ROOT_ERR="$REPO_ROOT"

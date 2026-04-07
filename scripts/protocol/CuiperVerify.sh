@@ -6,6 +6,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperVerify"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args,file"
+CUIPER_OUT="file,stdout"
+CUIPER_MODULE_OMSCHRIJVING="Cuiper3MarkovchainProtocol verificatie: C==B of rollback naar A"
+CUIPER_MODULE_WERKING="Vergelijkt NaVerwacht met Verwacht. Match: versie+1. Mismatch: git checkout rollback."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 LOGFILE="${1}"
 VERWACHT="${2}"
 NARESULTAAT="${3}"

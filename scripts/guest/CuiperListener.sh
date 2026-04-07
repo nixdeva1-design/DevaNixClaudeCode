@@ -6,6 +6,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperGuestListener"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="stdin,args"
+CUIPER_OUT="trail,stdout"
+CUIPER_MODULE_OMSCHRIJVING="Ontvangt en voert commando uit van hoofdnode op gastcomputer"
+CUIPER_MODULE_WERKING="Vereist consent.sh + connect.sh. Alle output gelogd. Klant ziet alles."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 SCRIPT_DIR="$(dirname "$0")"
 CONSENT_FILE="${SCRIPT_DIR}/.consent"
 

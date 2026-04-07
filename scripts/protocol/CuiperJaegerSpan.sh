@@ -16,6 +16,20 @@
 
 set -uo pipefail
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperJaegerSpan"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args"
+CUIPER_OUT="stdout"
+CUIPER_MODULE_OMSCHRIJVING="Stuurt een Jaeger tracing span voor elke prompt"
+CUIPER_MODULE_WERKING="POST naar Jaeger collector. trace_id + span_id + naam + start/eind + status."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 _SPAN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_SPAN_DIR/../../CuiperConfig.env"
 

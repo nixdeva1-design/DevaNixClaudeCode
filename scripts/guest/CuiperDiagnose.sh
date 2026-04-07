@@ -6,6 +6,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperDiagnose"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="none"
+CUIPER_OUT="stdout,file"
+CUIPER_MODULE_OMSCHRIJVING="Volledige hardware en OS diagnose op gastcomputer"
+CUIPER_MODULE_WERKING="CPU, RAM, opslag, netwerk, OS, kernel. Output naar stdout + logfile."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 SCRIPT_DIR="$(dirname "$0")"
 CONSENT_FILE="${SCRIPT_DIR}/.consent"
 

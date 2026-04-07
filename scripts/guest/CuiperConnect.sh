@@ -9,6 +9,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperConnect"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args"
+CUIPER_OUT="trail,stdout"
+CUIPER_MODULE_OMSCHRIJVING="Verbindt gastcomputer met hoofdnode via SSH/WireGuard/Tailscale"
+CUIPER_MODULE_WERKING="Transport automatisch bepaald op basis van adres en modus."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 SCRIPT_DIR="$(dirname "$0")"
 CONSENT_FILE="${SCRIPT_DIR}/.consent"
 HOOFDNODE="${1}"

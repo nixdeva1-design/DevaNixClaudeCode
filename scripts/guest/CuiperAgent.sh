@@ -8,6 +8,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperAgent"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args,stdin"
+CUIPER_OUT="trail,stdout"
+CUIPER_MODULE_OMSCHRIJVING="CuiperHive agent op gastcomputer: diagnose → connect → listener"
+CUIPER_MODULE_WERKING="Voert standaard sequentie uit. Implementeert Cuiper3MarkovchainProtocol volledig."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 SCRIPT_DIR="$(dirname "$0")"
 HOOFDNODE_IP="${1}"
 LOGDIR="${SCRIPT_DIR}/../../logs/trail"

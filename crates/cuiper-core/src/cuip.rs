@@ -1,130 +1,176 @@
-/// CuiperCuip — de ontwerpeenheid om elke coderegel
+/// cuip.rs — Cuip, de kleinste eenheid van CuiperHive
 ///
-/// De Cuip is een wrapper die om elke betekenisvolle code-eenheid wordt geschreven.
-/// Hij declareert de intentie VÓÓR uitvoering, en registreert de uitkomst NA uitvoering.
+/// Cuip is de basisatoom. Hij wikkelt elke betekenisvolle operatie in
+/// een intentie (vóór) + uitkomst (ná).
 ///
-/// Vóór uitvoering: waarde = CAN (alle potentie is aanwezig)
-/// Na uitvoering:   waarde = Voltooid | Mislukt(reden) | Gesedimenteerd
-///
-/// Het regelnummer IN de Cuip is zelf een CAN waarde:
-///   het is de positie in de code waar potentie bestaat.
-///   Na uitvoering weten we of die potentie gerealiseerd werd.
-///
-/// Gebruik in Rust:
-///   let cuip = CuiperCuip::nieuw(ulid, line!(), "lees entiteit uit databank");
-///   let result = db.zoek(id);
-///   let cuip = cuip.voltooi(result.is_ok(), "entiteit gelezen");
-///
-/// Gebruik in shell (via CuiperListener.sh):
-///   CUIP=$(cuip_nieuw "git push naar remote" 42)
-///   bash CuiperListener.sh --exec "git push" --naam "git-push" --stap $STAP
-///   # CuiperListener registreert automatisch de uitkomst
+/// Elke Cuip heeft:
+///   - ulid        : unieke identifier
+///   - timestamp   : unix seconden
+///   - regelnr     : broncode regel (via `line!()`)
+///   - omschrijving: intentie in mensentaal
+///   - hash        : deterministische fingerprint(ulid + regelnr + omschrijving)
+///   - bewaakt     : Vec<CuiperRegel> — regels die deze Cuip bewaakt
+///   - waarde      : CAN | Voltooid | Mislukt(reden) | Gesedimenteerd
 
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+// ─── CuipWaarde ──────────────────────────────────────────────────────────────
+
 /// CAN = pure potentie. Ongelijk aan null. Ongelijk aan NaN.
-/// Een Cuip met waarde CAN bestaat — maar is nog niet uitgevoerd.
 #[derive(Debug, Clone, PartialEq)]
 pub enum CuipWaarde {
-    /// Potentie aanwezig. Vóór uitvoering.
     Can,
-    /// Succesvol uitgevoerd. Potentie gerealiseerd.
     Voltooid,
-    /// Uitvoering mislukt. Reden gesedimenteerd, nooit /dev/null.
     Mislukt(String),
-    /// Opgeslagen als historisch feit in de trail.
     Gesedimenteerd,
 }
 
 impl std::fmt::Display for CuipWaarde {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Can             => write!(f, "CAN"),
-            Self::Voltooid        => write!(f, "VOLTOOID"),
-            Self::Mislukt(reden) => write!(f, "MISLUKT: {reden}"),
-            Self::Gesedimenteerd  => write!(f, "GESEDIMENTEERD"),
+            Self::Can            => write!(f, "CAN"),
+            Self::Voltooid       => write!(f, "VOLTOOID"),
+            Self::Mislukt(r)    => write!(f, "MISLUKT: {r}"),
+            Self::Gesedimenteerd => write!(f, "GESEDIMENTEERD"),
         }
     }
 }
 
-/// CuiperCuip — ontwerpeenheid met ULID, timestamp, regelnr, intentie
+// ─── Hash hulpfuncties ───────────────────────────────────────────────────────
+
+/// Deterministische u64 hash van een string (DefaultHasher — geen externe deps)
+pub fn bereken_hash_str(input: &str) -> u64 {
+    let mut h = DefaultHasher::new();
+    input.hash(&mut h);
+    h.finish()
+}
+
+/// Cuip-hash: fingerprint van (ulid + regelnr + omschrijving)
+pub fn cuip_hash(ulid: &str, regelnr: u32, omschrijving: &str) -> u64 {
+    let mut h = DefaultHasher::new();
+    ulid.hash(&mut h);
+    regelnr.hash(&mut h);
+    omschrijving.hash(&mut h);
+    h.finish()
+}
+
+// ─── CuiperRegel ─────────────────────────────────────────────────────────────
+
+/// CuiperRegel — een voorwaarde of wet die een Cuip bewaakt
+/// Elke regel heeft een deterministische hash zodat identieke regels
+/// herkenbaar zijn over instanties heen.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CuiperRegel {
+    pub naam:         String,
+    pub omschrijving: String,
+    /// Deterministische fingerprint: hash(naam:omschrijving)
+    pub hash:         u64,
+}
+
+impl CuiperRegel {
+    pub fn nieuw(naam: impl Into<String>, omschrijving: impl Into<String>) -> Self {
+        let naam = naam.into();
+        let omschrijving = omschrijving.into();
+        let hash = bereken_hash_str(&format!("{naam}:{omschrijving}"));
+        Self { naam, omschrijving, hash }
+    }
+
+    pub fn hash_hex(&self) -> String {
+        format!("{:016x}", self.hash)
+    }
+}
+
+impl std::fmt::Display for CuiperRegel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}] {} — {}", self.hash_hex(), self.naam, self.omschrijving)
+    }
+}
+
+// ─── Cuip — de kleinste eenheid ──────────────────────────────────────────────
+
+/// Cuip — de kleinste eenheid van CuiperHive
+///
+/// # Gebruik
+/// ```rust
+/// use cuiper_core::Cuip;
+/// use cuiper_core::cuip::CuiperRegel;
+///
+/// let cuip = Cuip::nieuw("01KN...".into(), line!(), "schrijf trail log")
+///     .met_regel(CuiperRegel::nieuw("geen_devnull", "output gaat naar trail"));
+/// let cuip = cuip.voltooi();
+/// println!("{}", cuip.als_trail_regel());
+/// ```
 #[derive(Debug, Clone)]
-pub struct CuiperCuip {
+pub struct Cuip {
     pub ulid:         String,
     pub timestamp:    u64,
     pub regelnr:      u32,
     pub omschrijving: String,
+    /// Deterministische fingerprint: hash(ulid + regelnr + omschrijving)
+    pub hash:         u64,
+    /// Vector van regels die deze Cuip bewaakt en over waakt
+    pub bewaakt:      Vec<CuiperRegel>,
     pub waarde:       CuipWaarde,
 }
 
-impl CuiperCuip {
-    /// Maak een nieuwe Cuip aan. Waarde begint als CAN.
-    ///
-    /// # Voorbeeld
-    /// ```rust
-    /// use cuiper_core::CuiperCuip;
-    /// let cuip = CuiperCuip::nieuw("01KN...".into(), line!(), "query database");
-    /// ```
+impl Cuip {
+    /// Maak een nieuwe Cuip. Waarde = CAN. Hash wordt berekend.
     pub fn nieuw(ulid: String, regelnr: u32, omschrijving: impl Into<String>) -> Self {
+        let omschrijving = omschrijving.into();
+        let hash = cuip_hash(&ulid, regelnr, &omschrijving);
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-
-        Self {
-            ulid,
-            timestamp,
-            regelnr,
-            omschrijving: omschrijving.into(),
-            waarde: CuipWaarde::Can,
-        }
+        Self { ulid, timestamp, regelnr, omschrijving, hash, bewaakt: Vec::new(), waarde: CuipWaarde::Can }
     }
 
-    /// Voltooi de Cuip na succesvolle uitvoering. CAN → Voltooid.
-    pub fn voltooi(mut self) -> Self {
-        self.waarde = CuipWaarde::Voltooid;
+    pub fn met_regel(mut self, r: CuiperRegel) -> Self {
+        self.bewaakt.push(r);
         self
     }
 
-    /// Markeer als mislukt. CAN → Mislukt(reden). Reden nooit weggooien.
-    pub fn mislukt(mut self, reden: impl Into<String>) -> Self {
-        self.waarde = CuipWaarde::Mislukt(reden.into());
+    pub fn met_regels(mut self, rs: Vec<CuiperRegel>) -> Self {
+        self.bewaakt.extend(rs);
         self
     }
 
-    /// Sedimenteer: sla op als historisch feit.
-    pub fn sedimenteer(mut self) -> Self {
-        self.waarde = CuipWaarde::Gesedimenteerd;
-        self
-    }
+    pub fn hash_hex(&self) -> String { format!("{:016x}", self.hash) }
 
-    /// Is de Cuip nog in de CAN staat?
-    pub fn is_can(&self) -> bool {
-        self.waarde == CuipWaarde::Can
-    }
+    pub fn voltooi(mut self) -> Self       { self.waarde = CuipWaarde::Voltooid; self }
+    pub fn mislukt(mut self, r: impl Into<String>) -> Self { self.waarde = CuipWaarde::Mislukt(r.into()); self }
+    pub fn sedimenteer(mut self) -> Self   { self.waarde = CuipWaarde::Gesedimenteerd; self }
 
-    /// Is de Cuip succesvol afgerond?
-    pub fn is_voltooid(&self) -> bool {
-        self.waarde == CuipWaarde::Voltooid
-    }
+    pub fn is_can(&self)     -> bool { self.waarde == CuipWaarde::Can }
+    pub fn is_voltooid(&self) -> bool { self.waarde == CuipWaarde::Voltooid }
 
-    /// Trail-formaat voor logging
     pub fn als_trail_regel(&self) -> String {
+        let hashes: Vec<String> = self.bewaakt.iter().map(|r| r.hash_hex()).collect();
+        let regels_str = if hashes.is_empty() { "—".into() } else { hashes.join(",") };
         format!(
-            "Cuip | {} | {} | L:{} | {} | {}",
+            "Cuip | {} | {} | L:{} | hash:{} | regels:[{}] | {} | {}",
             self.ulid, self.timestamp, self.regelnr,
-            self.omschrijving, self.waarde
+            self.hash_hex(), regels_str, self.omschrijving, self.waarde
         )
     }
 }
 
-/// Macro om een Cuip aan te maken met het huidige regelnummer
-/// Vereist: een ULID string als eerste argument
-///
-/// Gebruik: `cuip!(mijn_ulid, "beschrijving van volgende regel")`
+/// CuiperCuip — alias voor Cuip (backwards compatibility)
+pub type CuiperCuip = Cuip;
+
+// ─── Macro ───────────────────────────────────────────────────────────────────
+
+/// `cuip!(ulid, "omschrijving")` — Cuip met huidig regelnummer
+/// `cuip!(ulid, "omschrijving", regel1, regel2)` — met bewaakte regels
 #[macro_export]
 macro_rules! cuip {
     ($ulid:expr, $omschrijving:expr) => {
-        $crate::cuip::CuiperCuip::nieuw($ulid, line!(), $omschrijving)
+        $crate::cuip::Cuip::nieuw($ulid, line!(), $omschrijving)
+    };
+    ($ulid:expr, $omschrijving:expr, $($r:expr),+) => {
+        $crate::cuip::Cuip::nieuw($ulid, line!(), $omschrijving)
+            $(.met_regel($r))+
     };
 }

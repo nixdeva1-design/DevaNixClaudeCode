@@ -13,6 +13,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperSteward"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="hook,git"
+CUIPER_OUT="trail,file"
+CUIPER_MODULE_OMSCHRIJVING="Beheert continuïteit van ontwerpen en staat — proactief"
+CUIPER_MODULE_WERKING="Exporteert context. Bewaakt trail volledigheid. Vult ontbrekende logs aan."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 # ─── Centrale config — geen hardcoded paden ───────────────────────────────
 _STEWARD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_STEWARD_DIR/../../CuiperConfig.env"

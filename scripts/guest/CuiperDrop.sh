@@ -2,6 +2,20 @@
 # drop.sh — gastcomputer gereedschap
 # Elk commando staat zelfstandig. Cuiper bepaalt de volgorde.
 # Gebruik: bash drop.sh <commando> [opties]
+
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperDrop"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args,file"
+CUIPER_OUT="stdout"
+CUIPER_MODULE_OMSCHRIJVING="Stuurt een bestand of commando naar de gastcomputer"
+CUIPER_MODULE_WERKING="SCP of pipe transport. Verificatie na ontvangst."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
 # Geen /dev/null — alles is informatie
 
 SCRIPT_DIR="$(dirname "$0")"

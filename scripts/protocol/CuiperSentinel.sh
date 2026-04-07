@@ -7,6 +7,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperSentinel"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="hook"
+CUIPER_OUT="trail,git,push"
+CUIPER_MODULE_OMSCHRIJVING="Bewaakt de staat van de repo continu — redt bij onderbreking"
+CUIPER_MODULE_WERKING="Achtergrond proces. Detecteert sessie-onderbreking. Auto-commit+push."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 # ─── Centrale config — geen hardcoded paden ───────────────────────────────
 _SENTINEL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_SENTINEL_DIR/../../CuiperConfig.env"

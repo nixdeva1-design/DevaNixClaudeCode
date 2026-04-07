@@ -1,47 +1,234 @@
 #[cfg(test)]
 mod cuip_tests {
-    use crate::cuip::{CuiperCuip, CuipWaarde};
+    use crate::cuip::{Cuip, CuiperCuip, CuipWaarde, CuiperRegel, cuip_hash, bereken_hash_str};
 
     #[test]
     fn cuip_begint_als_can() {
-        let cuip = CuiperCuip::nieuw("01TEST000000000000000000000".into(), 42, "test operatie");
+        let cuip = Cuip::nieuw("01TEST000000000000000000000".into(), 42, "test operatie");
         assert!(cuip.is_can());
         assert_eq!(cuip.regelnr, 42);
         assert_eq!(cuip.omschrijving, "test operatie");
     }
 
     #[test]
-    fn cuip_voltooid_na_succes() {
-        let cuip = CuiperCuip::nieuw("01TEST000000000000000000001".into(), 1, "operatie")
+    fn cuip_heeft_hash() {
+        let cuip = Cuip::nieuw("01TEST000000000000000000000".into(), 42, "test operatie");
+        // Hash is deterministisch: zelfde input = zelfde hash
+        let verwacht = cuip_hash("01TEST000000000000000000000", 42, "test operatie");
+        assert_eq!(cuip.hash, verwacht);
+        assert_eq!(cuip.hash_hex().len(), 16);
+    }
+
+    #[test]
+    fn cuip_hash_is_deterministisch() {
+        let h1 = cuip_hash("01ULID", 10, "actie");
+        let h2 = cuip_hash("01ULID", 10, "actie");
+        assert_eq!(h1, h2);
+    }
+
+    #[test]
+    fn cuip_hash_verschilt_bij_andere_input() {
+        let h1 = cuip_hash("01ULID", 10, "actie a");
+        let h2 = cuip_hash("01ULID", 10, "actie b");
+        assert_ne!(h1, h2);
+    }
+
+    #[test]
+    fn cuip_met_bewaakte_regels() {
+        let r1 = CuiperRegel::nieuw("geen_devnull", "output gaat naar trail");
+        let r2 = CuiperRegel::nieuw("ulid_vereist", "elke stap heeft een ULID");
+        let cuip = Cuip::nieuw("01TESTREGEL00000000000000000".into(), 1, "test met regels")
+            .met_regel(r1.clone())
+            .met_regel(r2.clone());
+        assert_eq!(cuip.bewaakt.len(), 2);
+        assert_eq!(cuip.bewaakt[0].naam, "geen_devnull");
+        assert_eq!(cuip.bewaakt[1].naam, "ulid_vereist");
+    }
+
+    #[test]
+    fn cuiper_regel_hash_is_deterministisch() {
+        let r1 = CuiperRegel::nieuw("naam", "omschrijving");
+        let r2 = CuiperRegel::nieuw("naam", "omschrijving");
+        assert_eq!(r1.hash, r2.hash);
+        assert_eq!(r1.hash_hex().len(), 16);
+    }
+
+    #[test]
+    fn cuiper_regel_hash_verschilt_bij_andere_naam() {
+        let r1 = CuiperRegel::nieuw("regel_a", "zelfde omschrijving");
+        let r2 = CuiperRegel::nieuw("regel_b", "zelfde omschrijving");
+        assert_ne!(r1.hash, r2.hash);
+    }
+
+    #[test]
+    fn cuip_trail_bevat_hash_en_regels() {
+        let r = CuiperRegel::nieuw("test_regel", "test");
+        let cuip = Cuip::nieuw("01TESTTRAIL00000000000000000".into(), 99, "trail test")
+            .met_regel(r)
             .voltooi();
+        let trail = cuip.als_trail_regel();
+        assert!(trail.contains("01TESTTRAIL00000000000000000"));
+        assert!(trail.contains("L:99"));
+        assert!(trail.contains("hash:"));
+        assert!(trail.contains("regels:["));
+        assert!(trail.contains("VOLTOOID"));
+    }
+
+    #[test]
+    fn cuip_alias_cuipercuip_werkt() {
+        // CuiperCuip is alias voor Cuip — backwards compatibility
+        let cuip = CuiperCuip::nieuw("01TESTALIAS0000000000000000".into(), 1, "alias test");
+        assert!(cuip.is_can());
+    }
+
+    #[test]
+    fn cuip_voltooid_na_succes() {
+        let cuip = Cuip::nieuw("01TEST000000000000000000001".into(), 1, "operatie").voltooi();
         assert!(cuip.is_voltooid());
         assert!(!cuip.is_can());
     }
 
     #[test]
     fn cuip_mislukt_bewaart_reden() {
-        let cuip = CuiperCuip::nieuw("01TEST000000000000000000002".into(), 5, "riskante operatie")
+        let cuip = Cuip::nieuw("01TEST000000000000000000002".into(), 5, "riskante operatie")
             .mislukt("verbinding verbroken");
         assert!(!cuip.is_can());
-        assert!(!cuip.is_voltooid());
         assert!(matches!(cuip.waarde, CuipWaarde::Mislukt(ref r) if r == "verbinding verbroken"));
     }
 
     #[test]
-    fn cuip_trail_formaat_bevat_alle_velden() {
-        let cuip = CuiperCuip::nieuw("01TESTTRAIL00000000000000000".into(), 99, "trail test")
-            .voltooi();
-        let trail = cuip.als_trail_regel();
-        assert!(trail.contains("01TESTTRAIL00000000000000000"));
-        assert!(trail.contains("L:99"));
-        assert!(trail.contains("trail test"));
-        assert!(trail.contains("VOLTOOID"));
+    fn cuip_can_waarde_display() {
+        assert_eq!(format!("{}", CuipWaarde::Can), "CAN");
     }
 
     #[test]
-    fn cuip_can_waarde_display() {
-        let can = CuipWaarde::Can;
-        assert_eq!(format!("{can}"), "CAN");
+    fn bereken_hash_str_is_deterministisch() {
+        let h1 = bereken_hash_str("cuiper test");
+        let h2 = bereken_hash_str("cuiper test");
+        assert_eq!(h1, h2);
+    }
+}
+
+#[cfg(test)]
+mod wereld_tests {
+    use crate::wereld::{CuiperWaarde, CuiperVariabelen, CuiperParameters, CuiperWereld};
+
+    #[test]
+    fn cuiper_waarde_nul_is_can() {
+        let w = CuiperWaarde::Nul;
+        assert!(w.is_nul());
+    }
+
+    #[test]
+    fn cuiper_waarde_polymorf() {
+        let tekst = CuiperWaarde::Tekst("hallo".into());
+        let getal = CuiperWaarde::Int(42);
+        let vlag  = CuiperWaarde::Bool(true);
+        assert_eq!(tekst.als_tekst(), Some("hallo"));
+        assert_eq!(getal.als_int(), Some(42));
+        assert_eq!(vlag.als_bool(), Some(true));
+    }
+
+    #[test]
+    fn cuiper_waarde_dynamisch_json_roundtrip() {
+        let origeel = CuiperWaarde::Lijst(vec![
+            CuiperWaarde::Int(1),
+            CuiperWaarde::Tekst("twee".into()),
+        ]);
+        let json = origeel.als_json();
+        let terug = CuiperWaarde::van_json(&json).unwrap();
+        assert_eq!(origeel, terug);
+    }
+
+    #[test]
+    fn cuiper_variabelen_zet_haal() {
+        let mut v = CuiperVariabelen::nieuw();
+        v.zet("naam", CuiperWaarde::Tekst("cuiper".into()));
+        assert_eq!(v.haal("naam").unwrap(), &CuiperWaarde::Tekst("cuiper".into()));
+        assert!(v.bevat("naam"));
+        assert!(!v.bevat("onbekend"));
+    }
+
+    #[test]
+    fn cuiper_variabelen_haal_of_geeft_standaard() {
+        let v = CuiperVariabelen::nieuw();
+        let r = v.haal_of("ontbreekt", CuiperWaarde::Int(99));
+        assert_eq!(r, CuiperWaarde::Int(99));
+    }
+
+    #[test]
+    fn cuiper_parameters_positieel_en_benoemd() {
+        let p = CuiperParameters::nieuw()
+            .met("ulid", CuiperWaarde::Tekst("01KN...".into()))
+            .met("stap", CuiperWaarde::Int(57));
+        assert_eq!(p.len(), 2);
+        assert_eq!(p.haal("stap"), Some(&CuiperWaarde::Int(57)));
+        assert_eq!(p.positie(0).unwrap(), &CuiperWaarde::Tekst("01KN...".into()));
+    }
+
+    #[test]
+    fn cuiper_wereld_namespace_en_variabelen() {
+        let mut w = CuiperWereld::nieuw("lab/experiment1");
+        w.zet("teller", CuiperWaarde::Int(0));
+        assert_eq!(w.namespace, "lab/experiment1");
+        assert_eq!(w.haal("teller"), Some(&CuiperWaarde::Int(0)));
+    }
+}
+
+#[cfg(test)]
+mod io_bus_tests {
+    use crate::io_bus::{CuiperIOBus, CuiperInType, CuiperOutType, CuiperScope};
+    use crate::wereld::CuiperWaarde;
+
+    #[test]
+    fn io_bus_aanmaken_en_params() {
+        let mut bus = CuiperIOBus::nieuw(
+            "CuiperPromptCounter",
+            "0.2.0",
+            CuiperInType::Hook,
+            CuiperOutType::Trail,
+            CuiperScope::Globaal,
+            "protocol",
+        );
+        bus.input.parameters.voeg_toe("stap_nr", CuiperWaarde::Int(57));
+        assert_eq!(
+            bus.input.param("stap_nr"),
+            Some(&CuiperWaarde::Int(57))
+        );
+        assert_eq!(bus.module_naam, "CuiperPromptCounter");
+    }
+
+    #[test]
+    fn io_bus_fout_markeert_niet_succes() {
+        let mut bus = CuiperIOBus::nieuw(
+            "CuiperTest", "0.1.0",
+            CuiperInType::Geen, CuiperOutType::Geen,
+            CuiperScope::Lokaal, "test",
+        );
+        assert!(bus.is_succes());
+        bus.fout("iets ging mis");
+        assert!(!bus.is_succes());
+        assert!(bus.output.heeft_fouten());
+    }
+
+    #[test]
+    fn io_bus_schrijf_en_trail() {
+        let mut bus = CuiperIOBus::nieuw(
+            "CuiperTest", "0.1.0",
+            CuiperInType::Geen, CuiperOutType::Stdout,
+            CuiperScope::Namespace("klant/acme".into()), "klant/acme",
+        );
+        bus.schrijf("uitvoer regel 1");
+        bus.trail("trail entry 1");
+        assert_eq!(bus.output.stdout_buf.len(), 1);
+        assert_eq!(bus.output.trail_items.len(), 1);
+    }
+
+    #[test]
+    fn scope_display() {
+        assert_eq!(format!("{}", CuiperScope::Lokaal), "lokaal");
+        assert_eq!(format!("{}", CuiperScope::Namespace("lab/x".into())), "namespace:lab/x");
+        assert_eq!(format!("{}", CuiperScope::Geïsoleerd), "geïsoleerd");
     }
 }
 

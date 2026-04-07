@@ -12,6 +12,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_LIB_DIR}/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperBacklogPlanner"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args,file"
+CUIPER_OUT="stdout,file"
+CUIPER_MODULE_OMSCHRIJVING="Backlog beheer: toon, prioriteit, status, samenvatting"
+CUIPER_MODULE_WERKING="Leest CuiperBacklog.md. Subcommandos: toon/samenvatting/prioriteit/status."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 # ─── Centrale config — geen hardcoded paden ───────────────────────────────
 _PLANNER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_PLANNER_DIR/../../CuiperConfig.env"

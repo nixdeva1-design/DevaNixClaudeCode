@@ -5,6 +5,20 @@
 
 set -e
 
+# ─── CuiperModuleLib ─────────────────────────────────────────────────────────
+_CUIPER_GUEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/protocol/CuiperModuleLib.sh
+source "${_CUIPER_GUEST_DIR}/../protocol/CuiperModuleLib.sh" 2>/dev/null || true
+CUIPER_MODULE_NAAM="CuiperCleanup"
+CUIPER_MODULE_VERSIE="0.2.0"
+CUIPER_IN="args"
+CUIPER_OUT="trail,stdout"
+CUIPER_MODULE_OMSCHRIJVING="Verwijdert tijdelijke bestanden op gastcomputer na sessie"
+CUIPER_MODULE_WERKING="Ruimt CuiperAgent artefacten op. Logt alles — niets stil weggooien."
+cuiper_init_flags "$@"
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 SCRIPT_DIR="$(dirname "$0")"
 CONSENT_FILE="${SCRIPT_DIR}/.consent"
 
