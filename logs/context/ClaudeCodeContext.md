@@ -197,3 +197,23 @@
 
 **Recursie scope:** Cuiper=Anker. Max diepte: 10. (Von Neumann serieel model — toekomstige uitvinding buiten scope.)
 
+
+---
+## CuiperStapNr: 49 | ULID: 01JWTFSKN9EINDE
+**Datum:** 2026-04-07T10:15:44Z | **Branch:** claude/linux-usb-dual-boot-Hsk67
+
+| Veld | Waarde |
+|------|--------|
+| Huidige taak | Sessie-einde: 22/19 prompts |
+| Taak ULID | — |
+| Commit | 433e779 — CuiperStap48: sessie-einde 21/18 — dump + history |
+| Context status | DREMPEL_HARD |
+| Prompt nr | 22 |
+| Vorige stap | 01JWTFRKN8EINDE |
+
+**Backlog:** KRITIEK:0 HOOG:6 MEDIUM:9 LAAG:5 WEES:1 KLAAR:17
+
+**Recente trail logs:** 1775556897-drempel-fallback-CUIPER.log,1775556882-jaeger-span-fout-CUIPER.log,1775556882-drempel-fallback-CUIPER.log
+
+**Recursie scope:** Cuiper=Anker. Max diepte: 10. (Von Neumann serieel model — toekomstige uitvinding buiten scope.)
+
