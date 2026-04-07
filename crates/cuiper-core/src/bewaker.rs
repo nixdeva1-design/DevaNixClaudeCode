@@ -12,7 +12,7 @@
 /// Naam: CuiperBewaker — niet CuiperWacht (wacht impliceert passief)
 ///   De Bewaker handelt actief: blokkeert, escaleert, sedimenteert.
 
-use crate::cuip::{CuiperCuip, CuipWaarde};
+use crate::cuip::CuiperCuip;
 use crate::markov::{CuiperMarkovState, CuiperTransitie, CuiperUitkomst};
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
