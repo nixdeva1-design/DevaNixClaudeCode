@@ -1,0 +1,15 @@
+entity_type,id,naam,rol,mandaat_niveau,type,provider,eigenaar,omgeving,actief
+persoon,1,Cuiper,Hoofd Architect & Eigenaar,1,,,CuiperKantoor,,true
+persoon,2,Deva,AI Systeembeheerder,2,,,CuiperKantoor,,true
+ai_personeel,3,ClaudeCode,AI Personeel,3,CLI,Anthropic,CuiperKantoor,,true
+ai_personeel,4,Claude.ai,AI Personeel,3,Web,Anthropic,CuiperKantoor,,true
+omgeving,10,ontwerp,Ontwerpomgeving,,,,,ontwerp,true
+omgeving,11,test,Testomgeving,,,,,test,true
+omgeving,12,productie_hoofd,Hoofd Productie,,,,,productie,true
+omgeving,13,productie_sub,Sub Productie,,,,,productie,true
+infrastructuur,20,kantoor_servers,On-Premise,,on_premise,,CuiperKantoor,,true
+infrastructuur,21,cloud_azure,Cloud,,cloud,Microsoft,gehuurd,,true
+infrastructuur,22,cloud_aws,Cloud,,cloud,Amazon,gehuurd,,true
+infrastructuur,23,cloud_gcp,Cloud,,cloud,Google,gehuurd,,true
+agent_type,30,design-agent,Co-Ontwerper,3,design,,,ontwerp,true
+agent_type,31,implementatie-agent,Bouw Agent,3,implementatie,,,test,true

@@ -1,0 +1,104 @@
+{
+  "kantoor": {
+    "naam": "CuiperKantoor",
+    "eigenaar": {
+      "id": 1,
+      "naam": "Cuiper",
+      "rol": "Hoofd Architect & Eigenaar",
+      "mandaat": "volledig"
+    },
+    "systeembeheerder": {
+      "id": 2,
+      "naam": "Deva",
+      "rol": "AI Systeembeheerder",
+      "mandaat": "operationeel",
+      "verantwoordelijkheden": [
+        "LLM toegangen beheren",
+        "Betalingen verwerken",
+        "Dagelijks operationeel beheer",
+        "Tijdelijke mandaten uitdelen per proces",
+        "Technische kosten bewaken per proces"
+      ]
+    },
+    "ai_personeel": [
+      {
+        "id": 3,
+        "naam": "ClaudeCode",
+        "provider": "Anthropic",
+        "type": "CLI",
+        "mandaat_type": "tijdelijk_procesgebonden"
+      },
+      {
+        "id": 4,
+        "naam": "Claude.ai",
+        "provider": "Anthropic",
+        "type": "Web",
+        "mandaat_type": "tijdelijk_procesgebonden"
+      }
+    ]
+  },
+  "mandaat_systeem": {
+    "beschrijving": "Toegang en bevoegdheden worden verstrekt via mandaat besluiten",
+    "mandaat_gever": "Cuiper (via Deva operationeel)",
+    "ontvangers": ["kantoorpersoneel", "klanten"],
+    "voorwaarden": "per_proces_en_duur",
+    "klanten_zien_niet": ["interne economie", "werkstructuur", "codebase", "mandaat details"]
+  },
+  "proces_parameters": {
+    "beschrijving": "Parameters die meereizen per proces voor kostenbewaking",
+    "velden": {
+      "process_ulid": "Unieke proces ID in ULID formaat",
+      "start_unix": "Starttijd Unix timestamp in seconden",
+      "end_unix": "Eindtijd Unix timestamp in seconden",
+      "tokens_used": "Totaal aantal verbruikte tokens"
+    },
+    "valuta": "niet opgeslagen, alleen verbruiksmetriek"
+  },
+  "omgevingen": {
+    "ontwerp": {
+      "gebruikers": ["Cuiper", "design-agents"],
+      "data": "geen productiedata"
+    },
+    "test": {
+      "gebruikers": ["kantoorpersoneel", "implementatie-agents"]
+    },
+    "productie": {
+      "hoofd": {
+        "beheer": "Deva",
+        "toegang": "mandaat vereist"
+      },
+      "sub": {
+        "beschrijving": "Meerdere sub-omgevingen",
+        "resource_types": ["databases", "pakketten", "externe systemen"]
+      }
+    }
+  },
+  "infrastructuur": {
+    "kantoor": {
+      "servers": "eigendom kantoor",
+      "laptops": "kantoorpersoneel"
+    },
+    "klanten": {
+      "servers": "eigendom klant",
+      "laptops": "klantpersoneel"
+    },
+    "cloud": {
+      "providers": ["Microsoft Azure", "AWS", "Google Cloud"],
+      "servers_gehuurd": true
+    }
+  },
+  "agent_types": {
+    "design": {
+      "rol": "Co-ontwerper",
+      "output": "Voorstellen, geen code",
+      "max_output": "1 A4 per antwoord",
+      "instructie": "Geeft 2-3 opties met voor/nadelen"
+    },
+    "implementatie": {
+      "rol": "Bouwt goedgekeurde ontwerpen",
+      "vereiste": "Goedgekeurd ontwerp aanwezig",
+      "branch_formaat": "agent/{machine-id}/{issue-nummer}",
+      "claimt_issue": true
+    }
+  }
+}

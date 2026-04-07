@@ -1,0 +1,59 @@
+;; CuiperKantoor Datalog Schema
+;; Feiten en regels voor mandaat systeem
+
+;; --- Feiten: Entiteiten ---
+(persoon 1 "Cuiper"    "Hoofd Architect & Eigenaar" 1)
+(persoon 2 "Deva"      "AI Systeembeheerder"        2)
+(persoon 3 "ClaudeCode" "AI Personeel CLI"           3)
+(persoon 4 "Claude.ai"  "AI Personeel Web"           3)
+
+;; mandaat_niveau: 1=volledig, 2=operationeel, 3=tijdelijk
+
+;; --- Feiten: Omgevingen ---
+(omgeving "ontwerp"         1 "geen_productie")
+(omgeving "test"            2 "test")
+(omgeving "productie_hoofd" 3 "productie")
+(omgeving "productie_sub"   3 "productie")
+
+;; --- Feiten: Infrastructuur ---
+(infra "kantoor_servers" "on_premise" "CuiperKantoor" false)
+(infra "azure"           "cloud"      "Microsoft"      true)
+(infra "aws"             "cloud"      "Amazon"         true)
+(infra "gcp"             "cloud"      "Google"         true)
+
+;; --- Feiten: Mandaat relaties ---
+(geeft-mandaat 1 2)   ;; Cuiper geeft aan Deva
+(geeft-mandaat 2 3)   ;; Deva geeft aan ClaudeCode
+(geeft-mandaat 2 4)   ;; Deva geeft aan Claude.ai
+
+;; --- Regels ---
+
+;; Heeft iemand toegang tot een omgeving?
+(regel toegang-ontwerp ?persoon
+  (persoon ?persoon _ _ ?niveau)
+  (<= ?niveau 2))
+
+(regel toegang-productie ?persoon
+  (persoon ?persoon _ _ ?niveau)
+  (<= ?niveau 2)
+  (geeft-mandaat 2 ?persoon))
+
+;; Mag iemand een mandaat uitdelen?
+(regel mag-mandaat-uitdelen ?van ?naar
+  (geeft-mandaat ?van ?naar)
+  (persoon ?van _ _ ?niveau)
+  (<= ?niveau 2))
+
+;; Klanten zien nooit interne structuur
+(regel klant-zichtbaarheid ?klant ?gegeven
+  (klant ?klant _)
+  (eigen-proces ?klant ?gegeven))
+
+;; Proceskosten zijn niet-valuta
+(regel valide-proces ?ulid ?start ?eind ?tokens
+  (proces ?ulid ?start ?eind ?tokens)
+  (string? ?ulid)
+  (integer? ?start)
+  (integer? ?eind)
+  (integer? ?tokens)
+  (>= ?tokens 0))
