@@ -117,3 +117,23 @@
 
 **Recursie scope:** Cuiper=Anker. Max diepte: 10. (Von Neumann serieel model — toekomstige uitvinding buiten scope.)
 
+
+---
+## CuiperStapNr: 45 | ULID: 01JWTFNKN5CONTEXT45B
+**Datum:** 2026-04-07T10:14:51Z | **Branch:** claude/linux-usb-dual-boot-Hsk67
+
+| Veld | Waarde |
+|------|--------|
+| Huidige taak | Sessie afsluiten — harde drempel bereikt |
+| Taak ULID | — |
+| Commit | 3f1b038 — CuiperTrail: auto-vastleggen sessie log — prompt 18 (Cuipe |
+| Context status | OK |
+| Prompt nr | 18 |
+| Vorige stap | 01JWTFNKN5CONTEXT |
+
+**Backlog:** KRITIEK:0 HOOG:6 MEDIUM:9 LAAG:5 WEES:1 KLAAR:17
+
+**Recente trail logs:** 1775556882-jaeger-span-fout-CUIPER.log,1775556882-drempel-fallback-CUIPER.log,1775555543-jaeger-span-fout-CUIPER.log
+
+**Recursie scope:** Cuiper=Anker. Max diepte: 10. (Von Neumann serieel model — toekomstige uitvinding buiten scope.)
+
