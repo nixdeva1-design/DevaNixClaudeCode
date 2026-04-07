@@ -509,6 +509,271 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+    RAISE NOTICE '[ONTKOPPELD] Device % ontkoppeld door % op unix=%',
+        p_device_ulid, p_door_ulid, v_now;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================
+-- GPS Zone systeem: concentrische radius ringen per locatie
+-- Bewaakt of een device in de juiste zone/afdeling blijft
+-- ============================================================
+
+-- Zones: een benoemde locatie (klantafdeling, kantoorvleugel, gebouw)
+CREATE TABLE IF NOT EXISTS zones (
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    naam              TEXT    NOT NULL,
+    eigenaar_type     TEXT    NOT NULL CHECK (eigenaar_type IN ('kantoor', 'klant')),
+    eigenaar_ulid     TEXT    NOT NULL CHECK (is_valid_ulid(eigenaar_ulid)),
+    center_lat        NUMERIC(10, 7) NOT NULL,
+    center_lon        NUMERIC(10, 7) NOT NULL,
+    beschrijving      TEXT,
+    actief            BOOLEAN NOT NULL DEFAULT TRUE,
+    aangemaakt_op     BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
+);
+
+-- Zone ringen: concentrische cirkels rondom het zone centrum
+-- ring_volgorde 1 = binnenste (fijnste), hogere nummers = verder weg
+-- Voorbeeld: 1=bureau(5m), 2=afdeling(30m), 3=verdieping(100m), 4=gebouw(300m)
+CREATE TABLE IF NOT EXISTS zone_ringen (
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    zone_ulid         TEXT    NOT NULL REFERENCES zones(ulid),
+    ring_naam         TEXT    NOT NULL,      -- 'bureau', 'afdeling', 'verdieping', 'gebouw'
+    ring_volgorde     INTEGER NOT NULL CHECK (ring_volgorde > 0),
+    radius_min_m      NUMERIC NOT NULL DEFAULT 0 CHECK (radius_min_m >= 0),
+    radius_max_m      NUMERIC NOT NULL CHECK (radius_max_m > 0),
+    alert_niveau      TEXT    NOT NULL CHECK (alert_niveau IN ('info', 'waarschuwing', 'kritiek')),
+    actief            BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT chk_ring_radius CHECK (radius_max_m > radius_min_m),
+    UNIQUE (zone_ulid, ring_volgorde)
+);
+
+-- Toewijzing: welk device is in welke zone + tot welke ring toegestaan
+-- Een device mag maar op één toewijzing tegelijk actief zijn
+CREATE TABLE IF NOT EXISTS device_zone_toewijzing (
+    ulid                  TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                                  CHECK (is_valid_ulid(ulid)),
+    device_ulid           TEXT    NOT NULL REFERENCES devices(ulid),
+    zone_ulid             TEXT    NOT NULL REFERENCES zones(ulid),
+    max_toegestane_ring   INTEGER NOT NULL DEFAULT 2, -- tot welke ring is beweging toegestaan
+    geldig_van            BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+    geldig_tot            BIGINT,
+    toegewezen_door       TEXT    NOT NULL REFERENCES personen(ulid),
+    actief                BOOLEAN NOT NULL DEFAULT TRUE,
+
+    -- Device kan maar 1 actieve toewijzing hebben tegelijk
+    CONSTRAINT uq_device_actieve_zone UNIQUE (device_ulid, actief)
+        DEFERRABLE INITIALLY DEFERRED
+);
+
+-- GPS polling log: elke gemeten positie wordt vastgelegd
+CREATE TABLE IF NOT EXISTS device_locatie_log (
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    device_ulid       TEXT    NOT NULL REFERENCES devices(ulid),
+    gps_lat           NUMERIC(10, 7) NOT NULL,
+    gps_lon           NUMERIC(10, 7) NOT NULL,
+    nauwkeurigheid_m  NUMERIC,              -- GPS nauwkeurigheid in meters
+    tijdstip          BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+    -- Berekende positie tov zone
+    afstand_tot_center_m  NUMERIC,          -- afstand tot zone centrum
+    ring_ulid             TEXT REFERENCES zone_ringen(ulid),  -- in welke ring
+    binnen_toegestane_ring BOOLEAN          -- FALSE = overtreding
+);
+
+-- Overtredingen: device buiten toegestane ring of verkeerde zone
+CREATE TABLE IF NOT EXISTS zone_overtredingen (
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    device_ulid       TEXT    NOT NULL REFERENCES devices(ulid),
+    toewijzing_ulid   TEXT    REFERENCES device_zone_toewijzing(ulid),
+    locatie_log_ulid  TEXT    REFERENCES device_locatie_log(ulid),
+    overtreding_type  TEXT    NOT NULL CHECK (overtreding_type IN (
+                                  'buiten_zone',       -- verder dan max ring
+                                  'verkeerde_zone',    -- bij andere klant/afdeling
+                                  'onbekende_locatie', -- geen geldige toewijzing
+                                  'verwisseld_device'  -- ander MAC dan verwacht
+                              )),
+    afstand_m         NUMERIC,
+    alert_niveau      TEXT    NOT NULL CHECK (alert_niveau IN ('info', 'waarschuwing', 'kritiek')),
+    tijdstip          BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+    afgehandeld       BOOLEAN NOT NULL DEFAULT FALSE,
+    afgehandeld_door  TEXT    REFERENCES personen(ulid),
+    afgehandeld_op    BIGINT,
+    notitie           TEXT
+);
+
+-- ============================================================
+-- Haversine: berekent afstand in meters tussen twee GPS punten
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION gps_afstand_m(
+    lat1 NUMERIC, lon1 NUMERIC,
+    lat2 NUMERIC, lon2 NUMERIC
+)
+RETURNS NUMERIC AS $$
+DECLARE
+    r       NUMERIC := 6371000; -- aardstraal in meters
+    phi1    NUMERIC := radians(lat1);
+    phi2    NUMERIC := radians(lat2);
+    dphi    NUMERIC := radians(lat2 - lat1);
+    dlambda NUMERIC := radians(lon2 - lon1);
+    a       NUMERIC;
+BEGIN
+    a := sin(dphi / 2) ^ 2
+       + cos(phi1) * cos(phi2) * sin(dlambda / 2) ^ 2;
+    RETURN r * 2 * atan2(sqrt(a), sqrt(1 - a));
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- ============================================================
+-- GPS positie verwerken: log + ring bepalen + overtreding detecteren
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION verwerk_gps_positie(
+    p_device_ulid    TEXT,
+    p_lat            NUMERIC,
+    p_lon            NUMERIC,
+    p_nauwkeurigheid NUMERIC DEFAULT NULL
+)
+RETURNS VOID AS $$
+DECLARE
+    v_now            BIGINT := EXTRACT(EPOCH FROM NOW())::BIGINT;
+    v_toewijzing     RECORD;
+    v_zone           RECORD;
+    v_ring           RECORD;
+    v_afstand        NUMERIC;
+    v_log_ulid       TEXT := gen_ulid();
+    v_binnen         BOOLEAN := FALSE;
+    v_alert          TEXT;
+    v_type           TEXT;
+BEGIN
+    -- Haal actieve zone toewijzing op
+    SELECT dzt.*, z.center_lat, z.center_lon
+    INTO v_toewijzing
+    FROM device_zone_toewijzing dzt
+    JOIN zones z ON z.ulid = dzt.zone_ulid
+    WHERE dzt.device_ulid = p_device_ulid
+      AND dzt.actief = TRUE
+      AND (dzt.geldig_tot IS NULL OR dzt.geldig_tot >= v_now)
+    LIMIT 1;
+
+    -- Bereken afstand tot zone centrum
+    IF v_toewijzing IS NOT NULL THEN
+        v_afstand := gps_afstand_m(
+            p_lat, p_lon,
+            v_toewijzing.center_lat, v_toewijzing.center_lon
+        );
+
+        -- Zoek in welke ring het device valt
+        SELECT * INTO v_ring
+        FROM zone_ringen
+        WHERE zone_ulid = v_toewijzing.zone_ulid
+          AND radius_min_m <= v_afstand
+          AND radius_max_m >  v_afstand
+          AND actief = TRUE
+        ORDER BY ring_volgorde ASC
+        LIMIT 1;
+
+        -- Binnen toegestane ring?
+        v_binnen := (
+            v_ring IS NOT NULL AND
+            v_ring.ring_volgorde <= v_toewijzing.max_toegestane_ring
+        );
+    END IF;
+
+    -- Sla positie op in log
+    INSERT INTO device_locatie_log (
+        ulid, device_ulid, gps_lat, gps_lon,
+        nauwkeurigheid_m, tijdstip,
+        afstand_tot_center_m, ring_ulid, binnen_toegestane_ring
+    ) VALUES (
+        v_log_ulid, p_device_ulid, p_lat, p_lon,
+        p_nauwkeurigheid, v_now,
+        v_afstand, v_ring.ulid, v_binnen
+    );
+
+    -- Update actuele GPS op device
+    UPDATE devices SET
+        gps_lat           = p_lat,
+        gps_lon           = p_lon,
+        gps_bijgewerkt_op = v_now
+    WHERE ulid = p_device_ulid;
+
+    -- Overtreding aanmaken indien buiten zone
+    IF NOT v_binnen THEN
+        IF v_toewijzing IS NULL THEN
+            v_type  := 'onbekende_locatie';
+            v_alert := 'waarschuwing';
+        ELSIF v_ring IS NULL OR v_ring.ring_volgorde > v_toewijzing.max_toegestane_ring THEN
+            v_type  := 'buiten_zone';
+            v_alert := COALESCE(v_ring.alert_niveau, 'kritiek');
+        ELSE
+            v_type  := 'verkeerde_zone';
+            v_alert := 'kritiek';
+        END IF;
+
+        INSERT INTO zone_overtredingen (
+            device_ulid, toewijzing_ulid, locatie_log_ulid,
+            overtreding_type, afstand_m, alert_niveau, tijdstip
+        ) VALUES (
+            p_device_ulid, v_toewijzing.ulid, v_log_ulid,
+            v_type, v_afstand, v_alert, v_now
+        );
+
+        RAISE NOTICE '[ZONE OVERTREDING] device=% type=% afstand=% alert=%',
+            p_device_ulid, v_type, round(v_afstand), v_alert;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================
+-- Zone toewijzing aanpassen op afstand (alleen beheerder/Cuiper)
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION wijs_device_zone_toe(
+    p_device_ulid         TEXT,
+    p_zone_ulid           TEXT,
+    p_max_ring            INTEGER,
+    p_door_ulid           TEXT,
+    p_geldig_tot          BIGINT DEFAULT NULL
+)
+RETURNS TEXT AS $$
+DECLARE
+    v_now     BIGINT := EXTRACT(EPOCH FROM NOW())::BIGINT;
+    v_ulid    TEXT   := gen_ulid();
+BEGIN
+    IF NOT is_beheerder(p_door_ulid) THEN
+        RAISE EXCEPTION
+            'Onvoldoende rechten voor zone toewijzing (actor: %)', p_door_ulid;
+    END IF;
+
+    -- Deactiveer huidige toewijzing
+    UPDATE device_zone_toewijzing SET
+        actief     = FALSE,
+        geldig_tot = v_now
+    WHERE device_ulid = p_device_ulid
+      AND actief = TRUE;
+
+    -- Maak nieuwe toewijzing aan
+    INSERT INTO device_zone_toewijzing (
+        ulid, device_ulid, zone_ulid, max_toegestane_ring,
+        geldig_van, geldig_tot, toegewezen_door, actief
+    ) VALUES (
+        v_ulid, p_device_ulid, p_zone_ulid, p_max_ring,
+        v_now, p_geldig_tot, p_door_ulid, TRUE
+    );
+
+    RAISE NOTICE '[ZONE TOEWIJZING] device=% zone=% max_ring=% door=%',
+        p_device_ulid, p_zone_ulid, p_max_ring, p_door_ulid;
+
+    RETURN v_ulid;
+END;
+$$ LANGUAGE plpgsql;
+
 -- ============================================================
 -- STAP 4: Indexes
 -- ============================================================
@@ -569,6 +834,32 @@ CREATE INDEX IF NOT EXISTS idx_devices_gestolen
 
 CREATE INDEX IF NOT EXISTS idx_devices_mac
     ON devices (mac_adres) WHERE mac_adres IS NOT NULL;
+
+-- Zone systeem indexes
+CREATE INDEX IF NOT EXISTS idx_zones_eigenaar
+    ON zones (eigenaar_type, eigenaar_ulid);
+
+CREATE INDEX IF NOT EXISTS idx_zone_ringen_zone
+    ON zone_ringen (zone_ulid, ring_volgorde);
+
+CREATE INDEX IF NOT EXISTS idx_toewijzing_device_actief
+    ON device_zone_toewijzing (device_ulid) WHERE actief = TRUE;
+
+-- BTree op locatie_log tijdstip + device (polling queries)
+CREATE INDEX IF NOT EXISTS idx_locatie_log_device_tijd
+    ON device_locatie_log (device_ulid, tijdstip DESC);
+
+CREATE INDEX IF NOT EXISTS idx_locatie_log_buiten
+    ON device_locatie_log (device_ulid, tijdstip)
+    WHERE binnen_toegestane_ring = FALSE;
+
+-- Overtredingen: open (niet afgehandeld) snel ophalen
+CREATE INDEX IF NOT EXISTS idx_overtredingen_open
+    ON zone_overtredingen (alert_niveau, tijdstip)
+    WHERE afgehandeld = FALSE;
+
+CREATE INDEX IF NOT EXISTS idx_overtredingen_device
+    ON zone_overtredingen (device_ulid, tijdstip DESC);
 
 -- GIN op devices eigenaar_ulid (snel alle devices per klant/kantoor)
 CREATE INDEX IF NOT EXISTS idx_gin_devices_eigenaar
