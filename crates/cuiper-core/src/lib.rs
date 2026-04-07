@@ -18,6 +18,7 @@ pub mod entiteit;
 pub mod hive;
 pub mod mandaat;
 pub mod markov;
+pub mod zelfcontrole;
 #[cfg(test)]
 mod tests;
 
@@ -28,3 +29,4 @@ pub use entiteit::{CuiperEntiteit, CuiperHiveNr};
 pub use hive::CuiperHive;
 pub use mandaat::CuiperMandaat;
 pub use markov::{CuiperMarkovState, CuiperTransitie, CuiperUitkomst};
+pub use zelfcontrole::{CuiperZelfcontroleAI, CuiperContextSnapshot, CuiperContextStatus, ZelfcontrolesFout, MAX_RECURSIE_DIEPTE};
