@@ -109,6 +109,81 @@ CREATE TABLE IF NOT EXISTS infrastructuur (
     gehuurd         BOOLEAN NOT NULL DEFAULT FALSE
 );
 
+-- Devices: elke fysieke of virtuele machine
+-- eigenaar_type bepaalt of het kantoor of klant eigendom is
+CREATE TABLE IF NOT EXISTS devices (
+    ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                            CHECK (is_valid_ulid(ulid)),
+    naam            TEXT    NOT NULL,
+    type            TEXT    NOT NULL CHECK (type IN ('laptop', 'server', 'cloud_vm')),
+    eigenaar_type   TEXT    NOT NULL CHECK (eigenaar_type IN ('kantoor', 'klant')),
+    eigenaar_ulid   TEXT    NOT NULL
+                            CHECK (is_valid_ulid(eigenaar_ulid)),
+    -- Eigen cloud: klant draait in zijn eigen cloud omgeving
+    eigen_cloud     BOOLEAN NOT NULL DEFAULT FALSE,
+    cloud_provider  TEXT    CHECK (
+                        cloud_provider IS NULL OR
+                        cloud_provider IN ('azure', 'aws', 'gcp', 'overig')
+                    ),
+    actief          BOOLEAN NOT NULL DEFAULT TRUE,
+    aangemaakt_op   BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+
+    CONSTRAINT chk_cloud_provider CHECK (
+        (eigen_cloud = FALSE AND cloud_provider IS NULL) OR
+        (eigen_cloud = TRUE  AND cloud_provider IS NOT NULL)
+    )
+);
+
+-- Software producten die CuiperKantoor levert
+CREATE TABLE IF NOT EXISTS software_producten (
+    ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                            CHECK (is_valid_ulid(ulid)),
+    naam            TEXT    NOT NULL,
+    versie          TEXT    NOT NULL,
+    actief          BOOLEAN NOT NULL DEFAULT TRUE,
+    aangemaakt_op   BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
+);
+
+-- Licenties: 1 device per klant per softwareproduct
+-- Klant kan het product draaien op eigen device of eigen cloud VM
+CREATE TABLE IF NOT EXISTS licenties (
+    ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                            CHECK (is_valid_ulid(ulid)),
+    klant_ulid      TEXT    NOT NULL REFERENCES klanten(ulid),
+    product_ulid    TEXT    NOT NULL REFERENCES software_producten(ulid),
+    device_ulid     TEXT    NOT NULL REFERENCES devices(ulid),
+    geldig_van      BIGINT  NOT NULL,
+    geldig_tot      BIGINT,
+    actief          BOOLEAN NOT NULL DEFAULT TRUE,
+
+    -- 1 device per klant per product
+    CONSTRAINT uq_licentie_klant_product UNIQUE (klant_ulid, product_ulid)
+);
+
+-- Trigger: device moet eigendom zijn van de klant die de licentie heeft
+CREATE OR REPLACE FUNCTION chk_licentie_device_eigenaar()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM devices
+        WHERE ulid = NEW.device_ulid
+          AND eigenaar_type = 'klant'
+          AND eigenaar_ulid = NEW.klant_ulid
+          AND actief = TRUE
+    ) THEN
+        RAISE EXCEPTION
+            'Device % is geen actief device van klant % of verkeerd eigenaar type',
+            NEW.device_ulid, NEW.klant_ulid;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_chk_licentie_device ON licenties;
+CREATE TRIGGER trg_chk_licentie_device
+    BEFORE INSERT OR UPDATE ON licenties
+    FOR EACH ROW EXECUTE FUNCTION chk_licentie_device_eigenaar();
+
 CREATE TABLE IF NOT EXISTS mandaten (
     ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
                             CHECK (is_valid_ulid(ulid)),
@@ -125,6 +200,7 @@ CREATE TABLE IF NOT EXISTS mandaten (
 
 -- Processen: process_ulid IS de primaire sleutel
 -- mandaat_ulid is VERPLICHT — altijd lookup via ULID van het mandaat
+-- device_ulid — op welke machine draait dit proces
 CREATE TABLE IF NOT EXISTS processen (
     process_ulid    TEXT    PRIMARY KEY
                             CHECK (is_valid_ulid(process_ulid)),
@@ -132,6 +208,8 @@ CREATE TABLE IF NOT EXISTS processen (
                             REFERENCES mandaten(ulid),           -- VERPLICHTE lookup
     omgeving_ulid   TEXT    NOT NULL
                             REFERENCES omgevingen(ulid),
+    device_ulid     TEXT    NOT NULL
+                            REFERENCES devices(ulid),            -- op welk device
     agent_type      TEXT    NOT NULL CHECK (agent_type IN ('design', 'implementatie', 'review')),
     start_unix      BIGINT  NOT NULL,
     end_unix        BIGINT,
@@ -140,7 +218,6 @@ CREATE TABLE IF NOT EXISTS processen (
                             CHECK (status IN ('actief', 'voltooid', 'mislukt')),
     meta            JSONB,
 
-    -- Garantie: end_unix altijd na start_unix
     CONSTRAINT chk_tijdvolgorde CHECK (end_unix IS NULL OR end_unix >= start_unix)
 );
 
@@ -188,6 +265,21 @@ CREATE INDEX IF NOT EXISTS idx_gin_processen_meta
 -- BTree op mandaat_ulid in processen (snelle lookup per proces)
 CREATE INDEX IF NOT EXISTS idx_processen_mandaat_ulid
     ON processen (mandaat_ulid);
+
+-- BTree op device_ulid in processen
+CREATE INDEX IF NOT EXISTS idx_processen_device_ulid
+    ON processen (device_ulid);
+
+-- BTree op licenties klant + product
+CREATE INDEX IF NOT EXISTS idx_licenties_klant
+    ON licenties (klant_ulid);
+
+CREATE INDEX IF NOT EXISTS idx_licenties_device
+    ON licenties (device_ulid);
+
+-- GIN op devices eigenaar_ulid (snel alle devices per klant/kantoor)
+CREATE INDEX IF NOT EXISTS idx_gin_devices_eigenaar
+    ON devices USING GIN (eigenaar_ulid gin_trgm_ops);
 
 -- BTree op status + start_unix (actieve processen ophalen)
 CREATE INDEX IF NOT EXISTS idx_processen_status_start
