@@ -66,7 +66,36 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================
--- STAP 3: Tabellen met ULID als primaire sleutel
+-- STAP 3: God rechten helper — Cuiper bypast alle checks
+-- ============================================================
+
+-- Geeft TRUE als de actor Cuiper is (mandaat_niveau=1)
+-- Alle triggers controleren dit eerst — Cuiper wordt nooit geblokkeerd
+CREATE OR REPLACE FUNCTION is_cuiper(actor_ulid TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM personen
+        WHERE ulid = actor_ulid
+          AND mandaat_niveau = 1
+    );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Geeft TRUE als actor Cuiper of Deva is (niveau <= 2)
+CREATE OR REPLACE FUNCTION is_beheerder(actor_ulid TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM personen
+        WHERE ulid = actor_ulid
+          AND mandaat_niveau <= 2
+    );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- ============================================================
+-- STAP 4: Tabellen met ULID als primaire sleutel
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS personen (
@@ -112,25 +141,49 @@ CREATE TABLE IF NOT EXISTS infrastructuur (
 -- Devices: elke fysieke of virtuele machine
 -- eigenaar_type bepaalt of het kantoor of klant eigendom is
 CREATE TABLE IF NOT EXISTS devices (
-    ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
-                            CHECK (is_valid_ulid(ulid)),
-    naam            TEXT    NOT NULL,
-    type            TEXT    NOT NULL CHECK (type IN ('laptop', 'server', 'cloud_vm')),
-    eigenaar_type   TEXT    NOT NULL CHECK (eigenaar_type IN ('kantoor', 'klant')),
-    eigenaar_ulid   TEXT    NOT NULL
-                            CHECK (is_valid_ulid(eigenaar_ulid)),
-    -- Eigen cloud: klant draait in zijn eigen cloud omgeving
-    eigen_cloud     BOOLEAN NOT NULL DEFAULT FALSE,
-    cloud_provider  TEXT    CHECK (
-                        cloud_provider IS NULL OR
-                        cloud_provider IN ('azure', 'aws', 'gcp', 'overig')
-                    ),
-    actief          BOOLEAN NOT NULL DEFAULT TRUE,
-    aangemaakt_op   BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    naam              TEXT    NOT NULL,
+    type              TEXT    NOT NULL CHECK (type IN ('laptop', 'server', 'cloud_vm')),
+    eigenaar_type     TEXT    NOT NULL CHECK (eigenaar_type IN ('kantoor', 'klant')),
+    eigenaar_ulid     TEXT    NOT NULL CHECK (is_valid_ulid(eigenaar_ulid)),
+
+    -- Netwerk identiteit
+    mac_adres         TEXT    UNIQUE,  -- primaire hardware identifier
+
+    -- Vaste standplaats (thuislocatie van het device)
+    standplaats       TEXT,            -- adres of beschrijving
+    standplaats_lat   NUMERIC(10, 7),  -- GPS breedtegraad standplaats
+    standplaats_lon   NUMERIC(10, 7),  -- GPS lengtegraad standplaats
+
+    -- Laatste bekende GPS positie (live/polling)
+    gps_lat           NUMERIC(10, 7),
+    gps_lon           NUMERIC(10, 7),
+    gps_bijgewerkt_op BIGINT,          -- unix timestamp laatste GPS update
+
+    -- Eigen cloud
+    eigen_cloud       BOOLEAN NOT NULL DEFAULT FALSE,
+    cloud_provider    TEXT    CHECK (
+                          cloud_provider IS NULL OR
+                          cloud_provider IN ('azure', 'aws', 'gcp', 'overig')
+                      ),
+
+    -- Status en diefstal
+    actief            BOOLEAN NOT NULL DEFAULT TRUE,
+    gestolen          BOOLEAN NOT NULL DEFAULT FALSE,
+    gestolen_gemeld_op BIGINT,
+    ontkoppeld_op     BIGINT,          -- tijdstip remote ontkoppeling
+    ontkoppeld_door   TEXT    REFERENCES personen(ulid),  -- wie ontkoppelde
+
+    aangemaakt_op     BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
 
     CONSTRAINT chk_cloud_provider CHECK (
         (eigen_cloud = FALSE AND cloud_provider IS NULL) OR
         (eigen_cloud = TRUE  AND cloud_provider IS NOT NULL)
+    ),
+    CONSTRAINT chk_gestolen_tijdstip CHECK (
+        (gestolen = FALSE) OR
+        (gestolen = TRUE AND gestolen_gemeld_op IS NOT NULL)
     )
 );
 
@@ -258,11 +311,6 @@ CREATE TRIGGER trg_chk_licentie_mandaat
     BEFORE INSERT OR UPDATE ON licenties
     FOR EACH ROW EXECUTE FUNCTION chk_licentie_mandaat_type();
 
-DROP TRIGGER IF EXISTS trg_chk_licentie_device ON licenties;
-CREATE TRIGGER trg_chk_licentie_device
-    BEFORE INSERT OR UPDATE ON licenties
-    FOR EACH ROW EXECUTE FUNCTION chk_licentie_device_eigenaar();
-
 CREATE TABLE IF NOT EXISTS mandaten (
     ulid            TEXT    PRIMARY KEY DEFAULT gen_ulid()
                             CHECK (is_valid_ulid(ulid)),
@@ -324,6 +372,144 @@ CREATE TRIGGER trg_chk_mandaat_actief
     FOR EACH ROW EXECUTE FUNCTION chk_mandaat_actief();
 
 -- ============================================================
+-- Software installaties: technische + gedrag CRUD per device
+-- ============================================================
+
+-- Wat er geïnstalleerd staat op een device, met versie en config
+CREATE TABLE IF NOT EXISTS software_installaties (
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    device_ulid       TEXT    NOT NULL REFERENCES devices(ulid),
+    product_ulid      TEXT    NOT NULL REFERENCES software_producten(ulid),
+    licentie_ulid     TEXT    NOT NULL REFERENCES licenties(ulid),
+    versie            TEXT    NOT NULL,
+
+    -- Technische config (infrastructuur, poorten, paden, resources)
+    technisch_config  JSONB,
+
+    -- Gedrag config (features, limieten, UI gedrag — per licentie/mandaat)
+    gedrag_config     JSONB,
+
+    status            TEXT    NOT NULL DEFAULT 'actief'
+                              CHECK (status IN ('actief', 'gestopt', 'verwijderd')),
+    geinstalleerd_op  BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT,
+    bijgewerkt_op     BIGINT,
+    bijgewerkt_door   TEXT    REFERENCES personen(ulid),
+
+    UNIQUE (device_ulid, product_ulid)
+);
+
+-- Audit log: elke CRUD actie op installaties wordt vastgelegd
+CREATE TABLE IF NOT EXISTS installatie_log (
+    ulid              TEXT    PRIMARY KEY DEFAULT gen_ulid()
+                              CHECK (is_valid_ulid(ulid)),
+    installatie_ulid  TEXT    NOT NULL REFERENCES software_installaties(ulid),
+    actie             TEXT    NOT NULL CHECK (actie IN ('create','update_technisch','update_gedrag','delete')),
+    door_persoon_ulid TEXT    NOT NULL REFERENCES personen(ulid),
+    oude_waarde       JSONB,
+    nieuwe_waarde     JSONB,
+    tijdstip          BIGINT  NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())::BIGINT
+);
+
+-- Trigger: log elke wijziging op software_installaties automatisch
+CREATE OR REPLACE FUNCTION log_installatie_wijziging()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_actie TEXT;
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        v_actie := 'create';
+        INSERT INTO installatie_log
+            (installatie_ulid, actie, door_persoon_ulid, nieuwe_waarde)
+        VALUES
+            (NEW.ulid, v_actie, COALESCE(NEW.bijgewerkt_door, NEW.licentie_ulid),
+             row_to_json(NEW)::JSONB);
+    ELSIF TG_OP = 'UPDATE' THEN
+        IF OLD.technisch_config IS DISTINCT FROM NEW.technisch_config THEN
+            v_actie := 'update_technisch';
+        ELSE
+            v_actie := 'update_gedrag';
+        END IF;
+        INSERT INTO installatie_log
+            (installatie_ulid, actie, door_persoon_ulid, oude_waarde, nieuwe_waarde)
+        VALUES
+            (NEW.ulid, v_actie, COALESCE(NEW.bijgewerkt_door, NEW.licentie_ulid),
+             row_to_json(OLD)::JSONB, row_to_json(NEW)::JSONB);
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO installatie_log
+            (installatie_ulid, actie, door_persoon_ulid, oude_waarde)
+        VALUES
+            (OLD.ulid, 'delete', COALESCE(OLD.bijgewerkt_door, OLD.licentie_ulid),
+             row_to_json(OLD)::JSONB);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_log_installatie ON software_installaties;
+CREATE TRIGGER trg_log_installatie
+    AFTER INSERT OR UPDATE OR DELETE ON software_installaties
+    FOR EACH ROW EXECUTE FUNCTION log_installatie_wijziging();
+
+-- ============================================================
+-- Remote ontkoppeling bij diefstal
+-- Alleen Cuiper (god) of Deva (beheerder) mag dit uitvoeren
+-- Cascade: alle licenties + actieve processen op het device stoppen
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION ontkoppel_device(
+    p_device_ulid     TEXT,
+    p_door_ulid       TEXT   -- wie voert de ontkoppeling uit
+)
+RETURNS VOID AS $$
+DECLARE
+    v_now BIGINT := EXTRACT(EPOCH FROM NOW())::BIGINT;
+BEGIN
+    -- Cuiper bypast alles — anderen moeten beheerder zijn
+    IF NOT is_beheerder(p_door_ulid) THEN
+        RAISE EXCEPTION
+            'Onvoldoende rechten: alleen Cuiper of Deva mag een device ontkoppelen (actor: %)',
+            p_door_ulid;
+    END IF;
+
+    -- Device markeren als gestolen + ontkoppeld
+    UPDATE devices SET
+        gestolen             = TRUE,
+        gestolen_gemeld_op   = v_now,
+        ontkoppeld_op        = v_now,
+        ontkoppeld_door      = p_door_ulid,
+        actief               = FALSE
+    WHERE ulid = p_device_ulid;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Device % niet gevonden', p_device_ulid;
+    END IF;
+
+    -- Alle licenties op dit device deactiveren
+    UPDATE licenties SET actief = FALSE
+    WHERE device_ulid = p_device_ulid;
+
+    -- Alle actieve installaties stoppen
+    UPDATE software_installaties SET
+        status        = 'gestopt',
+        bijgewerkt_op = v_now,
+        bijgewerkt_door = p_door_ulid
+    WHERE device_ulid = p_device_ulid
+      AND status = 'actief';
+
+    -- Alle lopende processen op dit device beëindigen
+    UPDATE processen SET
+        status    = 'mislukt',
+        end_unix  = v_now
+    WHERE device_ulid = p_device_ulid
+      AND status = 'actief';
+
+    RAISE NOTICE '[ONTKOPPELD] Device % ontkoppeld door % op unix=%',
+        p_device_ulid, p_door_ulid, v_now;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================
 -- STAP 4: Indexes
 -- ============================================================
 
@@ -349,12 +535,40 @@ CREATE INDEX IF NOT EXISTS idx_processen_mandaat_ulid
 CREATE INDEX IF NOT EXISTS idx_processen_device_ulid
     ON processen (device_ulid);
 
--- BTree op licenties klant + product
-CREATE INDEX IF NOT EXISTS idx_licenties_klant
-    ON licenties (klant_ulid);
+-- BTree op licenties eigenaar + product
+CREATE INDEX IF NOT EXISTS idx_licenties_eigenaar
+    ON licenties (eigenaar_type, eigenaar_ulid);
 
 CREATE INDEX IF NOT EXISTS idx_licenties_device
     ON licenties (device_ulid);
+
+-- BTree op software_installaties
+CREATE INDEX IF NOT EXISTS idx_installaties_device
+    ON software_installaties (device_ulid);
+
+CREATE INDEX IF NOT EXISTS idx_installaties_status
+    ON software_installaties (status);
+
+-- GIN op installatie configs (doorzoekbare JSONB)
+CREATE INDEX IF NOT EXISTS idx_gin_installaties_technisch
+    ON software_installaties USING GIN (technisch_config);
+
+CREATE INDEX IF NOT EXISTS idx_gin_installaties_gedrag
+    ON software_installaties USING GIN (gedrag_config);
+
+-- BTree op installatie_log tijdstip (audit queries)
+CREATE INDEX IF NOT EXISTS idx_installatie_log_tijdstip
+    ON installatie_log (tijdstip);
+
+CREATE INDEX IF NOT EXISTS idx_installatie_log_installatie
+    ON installatie_log (installatie_ulid);
+
+-- BTree op devices: gestolen + GPS
+CREATE INDEX IF NOT EXISTS idx_devices_gestolen
+    ON devices (gestolen) WHERE gestolen = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_devices_mac
+    ON devices (mac_adres) WHERE mac_adres IS NOT NULL;
 
 -- GIN op devices eigenaar_ulid (snel alle devices per klant/kantoor)
 CREATE INDEX IF NOT EXISTS idx_gin_devices_eigenaar
