@@ -1,0 +1,26 @@
+CuiperBouwProtocol — Verwachte staat (B1)
+ULID:        01KNN7NNMPPWJCSQZC0Y2R5N82
+Stap:        59
+A1-commit:   5e3295e7d0eb04e5ca8ed0f0fae9320d317095ea
+Timestamp:   1775608093
+
+Targets:
+  nixos/db/006_CuiperPrompts.sql           — cuiper.prompts tabel + GIN
+  nixos/db/007_CuiperNabeschouwingen.sql   — cuiper.nabeschouwingen tabel + GIN
+  scripts/protocol/CuiperPromptLogger.sh  — schrijft .jsonl/.sql/.md/.dl per stap
+
+Verwacht:
+  1. cuiper.prompts bevat: ulid, unix_ts, stap_nr, sessie_nr, branch,
+     vraag_prompt, redenering_prompt, antwoord_prompt, nabeschouwing,
+     markov_staat, GIN index op alle tekstvelden
+  2. cuiper.nabeschouwingen bevat: ulid, ref_ulid (FK prompts), type
+     (MATCH/MISMATCH), uitkomst_beschrijving, alternatieven_overwogen,
+     error_code, error_bericht, conflicten, geleerd
+  3. CuiperPromptLogger.sh schrijft per stap:
+     logs/prompts/<ulid>-stap<nr>.jsonl  (PostgreSQL COPY / DuckDB)
+     logs/prompts/<ulid>-stap<nr>.sql   (direct INSERT statement)
+     logs/prompts/<ulid>-stap<nr>.md    (human readable)
+     logs/prompts/<ulid>-stap<nr>.dl    (Datalog feiten)
+  4. bash CuiperPromptLogger.sh /h → exit 0 + toont help
+
+Test-cmd: bash scripts/protocol/CuiperPromptLogger.sh /h && grep -q "cuiper.prompts" nixos/db/006_CuiperPrompts.sql
