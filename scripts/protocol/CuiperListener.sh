@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP001LISTENER000000000
+# Naam:          scripts/protocol/CuiperListener.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 34
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperListener.sh — uitvoeringsomgeving voor alle CuiperHive code
 #
 # Taken:

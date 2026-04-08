@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP008SERVICES0000000
+# Naam:          nixos/modules/CuiperServices.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 33
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, lib, pkgs, ... }:
 
 let
@@ -190,8 +197,14 @@ in
           MINDSDB_PORT        = toString ports.mindsdb.http;
         };
         serviceConfig = {
-          ExecStart      = "${pkgs.python312}/bin/python3 -m mindsdb";
+          # MindsDB is niet in nixpkgs. Installeer na eerste boot:
+          #   python3 -m venv /data/mindsdb/env
+          #   /data/mindsdb/env/bin/pip install mindsdb
+          # Zie /data/mindsdb/INSTALLEER.txt
+          ExecStartPre   = "${pkgs.bash}/bin/bash -c 'test -x /data/mindsdb/env/bin/python3 || { echo \"[MINDSDB] Venv ontbreekt — zie /data/mindsdb/INSTALLEER.txt\" >&2; exit 1; }'";
+          ExecStart      = "/data/mindsdb/env/bin/python3 -m mindsdb";
           Restart        = "on-failure";
+          RestartSec     = "30s";
           User           = "reparateur";
           StandardOutput = "append:/data/logs/mindsdb/mindsdb.log";
           StandardError  = "append:/data/logs/mindsdb/mindsdb-error.log";
@@ -200,6 +213,7 @@ in
       systemd.tmpfiles.rules = [
         "d /data/mindsdb        0755 reparateur users -"
         "d /data/logs/mindsdb   0755 reparateur users -"
+        "f /data/mindsdb/INSTALLEER.txt 0644 reparateur users - 'Installeer MindsDB: python3 -m venv /data/mindsdb/env && /data/mindsdb/env/bin/pip install mindsdb'"
       ];
     })
 

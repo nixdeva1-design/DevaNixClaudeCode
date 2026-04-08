@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP007PORTS00000000000
+# Naam:          nixos/modules/CuiperPorts.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 19
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { lib, ... }:
 
 # ─── CuiperHive Poortregistry ─────────────────────────────────────────────

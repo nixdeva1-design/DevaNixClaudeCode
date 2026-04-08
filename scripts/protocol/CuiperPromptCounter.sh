@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP002COUNTER0000000000
+# Naam:          scripts/protocol/CuiperPromptCounter.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 31
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperPromptCounter.sh
 # Doel: dynamische context-drempel bewaking + auto-vastleggen trail logs
 # Aangeroepen vanuit .claude/settings.json Stop hook na elke respons

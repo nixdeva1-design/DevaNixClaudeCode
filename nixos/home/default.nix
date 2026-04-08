@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP031HOME000000000000
+# Naam:          nixos/home/default.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 24
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, pkgs, lib, ... }:
 
 {
@@ -79,7 +86,7 @@
 
       # Services
       db    = "pgcli -U reparateur";
-      gitea = "xdg-open http://localhost:3000";
+      gitea = "xdg-open http://localhost:3001";  # CuiperPorts: gitea = 3001
       n8n   = "xdg-open http://localhost:5678";
 
       # Snapshots / debug

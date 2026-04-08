@@ -1,3 +1,10 @@
+-- ─── CuiperHeader ───────────────────────────────────────────────────────────
+-- ULID:          01COMP035CLAUDECTX000000
+-- Naam:          ontologie/ClaudeCodeContext.sql
+-- Erft via:      CuiperCore → CuiperDonut → CuiperZelfcontroleAI
+-- Aangemaakt:    CuiperStapNr 45
+-- Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+-- ────────────────────────────────────────────────────────────────────────────
 -- ClaudeCodeContext.sql
 -- Context dump schema voor CuiperZelfcontroleAI
 -- Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperZelfcontroleAI → ClaudeCodeContext

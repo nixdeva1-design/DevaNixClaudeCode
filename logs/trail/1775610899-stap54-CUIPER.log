@@ -1,0 +1,21 @@
+ULID:                  01KNNA3A49JPYBYKXE5XS9G7AH
+UnixTimestamp:         1775610899
+CuiperStapNr:          54
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/add-documentation-practices-cMBk1
+Vraagprompt:           01KNJCNH5 is voorkeur en correct + ja PostgreSQL init uitbreiden, firewall corrigeren, MindsDB aanpassen
+Redenering:            Drie blockers gefix + CuiperHeader op alle bestanden toegepast (01KNJCNH5). PostgreSQL init krijgt 4 DB's. Firewall 3000→3001, 8080 verwijderd. MindsDB venv patroon met INSTALLEER.txt. CuiperHeader batch op 14 scripts, 14 .nix files, 7 ontologie files. 23 nieuwe componenten geregistreerd in CuiperHiveCoreOntologie.sql.
+Antwoordprompt:        Alle 3 blockers opgelost. CuiperHeader op 35 bestanden toegepast. 23 componenten nieuw geregistreerd.
+Plan:                  Fix blockers → headers NixOS → headers ontologie → headers scripts → component registratie → backlog → commit → push
+CuiperStatusBackup54:  Geen CuiperHeaders in NixOS/scripts/ontologie. 3 NixOS boot-blockers. 01KNJCNH5 OPEN.
+CuiperVerwachtBackup54: Alle bestanden met CuiperHeader. 3 blockers gefix. 01KNJCNH5 KLAAR. 01JWQN06 KLAAR.
+Rollbackpunt:          b9489d3
+CuiperNaVerwachtBackup54: C==B. Alle headers aanwezig. Blockers gefix. Backlog bijgewerkt.
+
+Nabeschouwing:
+  PostgreSQL init: 4 databases toegevoegd (gitea n8n grafana mlflow) + pgvector extensie op reparateur db.
+  Firewall: 3000 verwijderd (niets luistert), 3001 toegevoegd (Gitea correct), 8080 verwijderd (gateway niet geimplementeerd).
+  MindsDB: venv patroon met ExecStartPre check + INSTALLEER.txt. Afgewezen: Docker (te groot), pip install in nix (anti-pattern).
+  CuiperHeader formaat: 7-regel blok met ULID/Naam/Erft/Aangemaakt/Gewijzigd. Afgewezen: inline eenregel (te weinig context).
+  Batch headers scripts: Python script via Bash voor repetitief mechanisch werk op 14 bestanden.
+  Component registratie: 23 nieuwe entries in CuiperHiveCoreOntologie.sql via INSERT ON CONFLICT DO NOTHING.

@@ -1,3 +1,10 @@
+// ─── CuiperHeader ───────────────────────────────────────────────────────────
+// ULID:          01COMP039PROMPTCYPHER000
+// Naam:          ontologie/CuiperPromptOntologie.cypher
+// Erft via:      CuiperCore → CuiperDonut → CuiperPromptExportOperator
+// Aangemaakt:    CuiperStapNr 53
+// Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+// ────────────────────────────────────────────────────────────────────────────
 // CuiperPromptOntologie.cypher
 // Neo4j Cypher schema: constraints, indexes en laadpatronen
 // Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperPromptExportOperator

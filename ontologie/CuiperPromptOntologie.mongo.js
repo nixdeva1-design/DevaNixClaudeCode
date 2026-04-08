@@ -1,3 +1,10 @@
+// ─── CuiperHeader ───────────────────────────────────────────────────────────
+// ULID:          01COMP038PROMPTMONGO0000
+// Naam:          ontologie/CuiperPromptOntologie.mongo.js
+// Erft via:      CuiperCore → CuiperDonut → CuiperPromptExportOperator
+// Aangemaakt:    CuiperStapNr 53
+// Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+// ────────────────────────────────────────────────────────────────────────────
 // CuiperPromptOntologie.mongo.js
 // MongoDB collection schema + validator + indexes
 // Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperPromptExportOperator

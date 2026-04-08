@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP047VERIFY000000000
+# Naam:          scripts/protocol/CuiperVerify.sh
+# Erft via:      CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst
+# Aangemaakt:    CuiperStapNr 24
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # verify.sh — Cuiper3MarkovchainProtocol verificatie
 # Vergelijkt CuiperNaVerwachtBackup met CuiperVerwachtBackup
 # Beslist: vooruit (versie+1) of rollback

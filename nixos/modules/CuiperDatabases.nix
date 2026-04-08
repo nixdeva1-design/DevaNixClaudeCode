@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP009DATABASES000000
+# Naam:          nixos/modules/CuiperDatabases.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 33
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, lib, pkgs, ... }:
 
 let
@@ -35,10 +42,31 @@ in
 
         initialScript = pkgs.writeText "pg-init.sql" ''
           CREATE USER reparateur WITH SUPERUSER;
+
+          -- Basis database
           CREATE DATABASE reparateur OWNER reparateur;
+
+          -- Service databases — elke service isoleert zijn data
+          CREATE DATABASE gitea   OWNER reparateur;
+          CREATE DATABASE n8n     OWNER reparateur;
+          CREATE DATABASE grafana OWNER reparateur;
+          CREATE DATABASE mlflow  OWNER reparateur;
+
+          -- Geïsoleerde rollen per namespace
           CREATE USER lab_user   WITH PASSWORD 'lab';
           CREATE USER klant_user WITH PASSWORD 'klant';
+
+          -- Toegangsbeperking
           REVOKE ALL ON DATABASE reparateur FROM PUBLIC;
+          REVOKE ALL ON DATABASE gitea      FROM PUBLIC;
+          REVOKE ALL ON DATABASE n8n        FROM PUBLIC;
+          REVOKE ALL ON DATABASE grafana    FROM PUBLIC;
+          REVOKE ALL ON DATABASE mlflow     FROM PUBLIC;
+
+          -- pgvector extensie activeren op reparateur database
+          \c reparateur
+          CREATE EXTENSION IF NOT EXISTS vector;
+          CREATE EXTENSION IF NOT EXISTS pg_trgm;
         '';
 
         extraPlugins = with pkgs.postgresql16Packages; [ pgvector ];

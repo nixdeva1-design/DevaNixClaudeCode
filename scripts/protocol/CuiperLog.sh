@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP043LOG000000000000
+# Naam:          scripts/protocol/CuiperLog.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 24
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # log.sh — schrijft trail log naar logs/trail/
 # Gebruik: log.sh <volgnr> <hivenr> <hienaam> <vraag> <redenering> <antwoord> <plan> <status_n> <verwacht_n> <rollback>
 # Geen /dev/null — alles is informatie

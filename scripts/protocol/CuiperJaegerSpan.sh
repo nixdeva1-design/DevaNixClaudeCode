@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP017JAEGERSPAN000000
+# Naam:          scripts/protocol/CuiperJaegerSpan.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 35
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperJaegerSpan.sh — stuur één OTLP HTTP span naar Jaeger
 #
 # Gebruik:

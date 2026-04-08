@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP046ULID0000000000000
+# Naam:          scripts/protocol/CuiperUlid.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 24
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # ulid.sh — genereert een ULID (Universally Unique Lexicographically Sortable ID)
 # Output: ULID als string
 # Alle output naar stdout, niets naar /dev/null

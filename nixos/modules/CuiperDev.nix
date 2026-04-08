@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP027DEV000000000000
+# Naam:          nixos/modules/CuiperDev.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 28
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, pkgs, ... }:
 
 {

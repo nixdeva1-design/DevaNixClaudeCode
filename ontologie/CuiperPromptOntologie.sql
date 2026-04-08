@@ -1,3 +1,10 @@
+-- ─── CuiperHeader ───────────────────────────────────────────────────────────
+-- ULID:          01COMP036PROMPTSQL000000
+-- Naam:          ontologie/CuiperPromptOntologie.sql
+-- Erft via:      CuiperCore → CuiperDonut → CuiperPromptExportOperator
+-- Aangemaakt:    CuiperStapNr 53
+-- Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+-- ────────────────────────────────────────────────────────────────────────────
 -- CuiperPromptOntologie.sql
 -- SQLite / DuckDB compatibel basisschema
 -- Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperPromptExportOperator

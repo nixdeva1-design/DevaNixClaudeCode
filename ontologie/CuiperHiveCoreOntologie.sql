@@ -1,3 +1,10 @@
+-- ─── CuiperHeader ───────────────────────────────────────────────────────────
+-- ULID:          01COMP015ONTOLOGIE000000
+-- Naam:          ontologie/CuiperHiveCoreOntologie.sql
+-- Erft via:      CuiperCore → CuiperDonut
+-- Aangemaakt:    CuiperStapNr 34
+-- Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+-- ────────────────────────────────────────────────────────────────────────────
 -- CuiperHiveCoreOntologie.sql
 -- Beschrijft UITSLUITEND de leden en componenten van de CuiperHive.
 -- Dit is NIET de CuiperOerOntologie (die beschrijft alles wat kan bestaan).
@@ -204,6 +211,48 @@ VALUES
 ('01VBND012', '01COMP020TRAILLOGOP00000',  '01COMP001LISTENER000000000','bewaakt',   'TrailLogOperator bewaakt dat Listener trail schrijft', 0),
 ('01VBND013', '01COMP023DEVNULOP000000',   '01COMP002COUNTER0000000000','bewaakt',  'DevNulVerbodOperator bewaakt Counter op /dev/null gebruik', 0)
 ON CONFLICT (ulid) DO NOTHING;
+
+-- ─── Componenten aangemaakt CuiperStapNr 53-54 ───────────────────────────────
+
+INSERT INTO cuiper_hive_component (ulid, naam, type, pad, beschrijving, eigenaar_hive_nr, aangemaakt_stap, aangemaakt, gewijzigd)
+VALUES
+('01COMP025FLAKE0000000000', 'nixos/flake.nix',               'nix-module', 'nixos/flake.nix',                              'CuiperHive flake. Drie profielen: standaard, ai-werkstation, minimal.',         1, 8,  0, 0),
+('01COMP026SYSTEM0000000000','CuiperSystem',                   'nix-module', 'nixos/modules/CuiperSystem.nix',               'Boot, btrfs USB subvolumes, gebruiker reparateur, firewall, Docker, SSH.',      1, 8,  0, 0),
+('01COMP027DEV000000000000', 'CuiperDev',                      'nix-module', 'nixos/modules/CuiperDev.nix',                  'Dev toolchain: Rust, Python+LangChain, Node.js, claude-code CLI.',              1, 28, 0, 0),
+('01COMP028NGINX0000000000', 'CuiperNginx',                    'nix-module', 'nixos/modules/CuiperNginx.nix',                'Nginx reverse proxy. Conditionele vhosts per actieve service.',                 1, 26, 0, 0),
+('01COMP029DESKTOP00000000', 'CuiperDesktop',                  'nix-module', 'nixos/modules/CuiperDesktop.nix',              'GNOME/Wayland desktop, Pipewire audio, printer support, Logseq.',              1, 24, 0, 0),
+('01COMP030HYPERON00000000', 'CuiperHyperon',                  'nix-module', 'nixos/modules/CuiperHyperon.nix',              'OpenCog Hyperon MeTTa runtime. AGI inferentie laag.',                           1, 33, 0, 0),
+('01COMP031HOME000000000000','nixos/home',                     'nix-module', 'nixos/home/default.nix',                       'Home-manager: Neovim, Git, Fish shell, Alacritty, claude API key template.',    1, 24, 0, 0),
+('01COMP032STANDAARD000000', 'clients/standaard',              'config',     'nixos/clients/standaard.nix',                  'Klantprofiel standaard: alle services en databases actief.',                    1, 19, 0, 0),
+('01COMP033AIWERKST0000000', 'clients/ai-werkstation',         'config',     'nixos/clients/ai-werkstation.nix',             'Klantprofiel AI focus: Ollama, MindsDB, MLflow, Neo4j.',                        1, 26, 0, 0),
+('01COMP034MINIMAL000000000','clients/minimal',                'config',     'nixos/clients/minimal.nix',                    'Klantprofiel minimaal: alleen PostgreSQL, Gitea, Redis.',                       1, 26, 0, 0),
+('01COMP035CLAUDECTX000000', 'ClaudeCodeContext',              'sql-schema', 'ontologie/ClaudeCodeContext.sql',               'Context dump schema voor CuiperZelfcontroleAI.',                                3, 45, 0, 0),
+('01COMP036PROMPTSQL000000', 'CuiperPromptOntologie.sql',      'sql-schema', 'ontologie/CuiperPromptOntologie.sql',          'VraagPrompt, BeredeneringPrompt, AntwoordPrompt — SQLite/DuckDB.',              3, 53, 0, 0),
+('01COMP037PROMPTPSQL00000', 'CuiperPromptOntologie.psql',     'sql-schema', 'ontologie/CuiperPromptOntologie.psql',         'PostgreSQL extensie: pgvector, GIN indexes, semantische zoekfunctie.',          3, 53, 0, 0),
+('01COMP038PROMPTMONGO0000', 'CuiperPromptOntologie.mongo.js', 'ontologie',  'ontologie/CuiperPromptOntologie.mongo.js',     'MongoDB collection schema + JSON Schema validator.',                            3, 53, 0, 0),
+('01COMP039PROMPTCYPHER000', 'CuiperPromptOntologie.cypher',   'ontologie',  'ontologie/CuiperPromptOntologie.cypher',       'Neo4j Cypher constraints, indexes, MERGE patronen.',                            3, 53, 0, 0),
+('01COMP040PROMPTDL0000000', 'CuiperPromptOntologie.dl',       'ontologie',  'ontologie/CuiperPromptOntologie.dl',           'Datalog fact schema + afgeleide regels (succes/rollback/wees).',                3, 53, 0, 0),
+('01COMP041CTXDUMP0000000',  'CuiperContextDump',              'script',     'scripts/protocol/CuiperContextDump.sh',        'Context dump na elke CuiperStapNr voor CuiperZelfcontroleAI.',                  3, 45, 0, 0),
+('01COMP042IDEE00000000000', 'CuiperIdee',                     'script',     'scripts/protocol/CuiperIdee.sh',               'ci:: prefix handler. Registreert ideeen als WEES in backlog + wezen.jsonl.',    3, 45, 0, 0),
+('01COMP043LOG000000000000', 'CuiperLog',                      'script',     'scripts/protocol/CuiperLog.sh',                'Trail log schrijver naar logs/trail/.',                                         3, 24, 0, 0),
+('01COMP044PROMPTEXP0000000','CuiperPromptExporter',           'script',     'scripts/protocol/CuiperPromptExporter.sh',     'Exporteert sessie prompts naar JSON/JSONL + SQL/Cypher/DL/Mongo INSERT.',       3, 41, 0, 0),
+('01COMP045SESSIESTART000000','CuiperSessieStart',             'script',     'scripts/protocol/CuiperSessieStart.sh',        'PreToolUse hook: SESSIE_OPEN log + CuiperSessieNr verhogen.',                   3, 31, 0, 0),
+('01COMP046ULID0000000000000','CuiperUlid',                    'script',     'scripts/protocol/CuiperUlid.sh',               'Genereert ULID. Gebruikt door alle protocol scripts.',                          3, 24, 0, 0),
+('01COMP047VERIFY000000000', 'CuiperVerify',                   'script',     'scripts/protocol/CuiperVerify.sh',             'Markov C bepalen: C==B (succes) of C!=B (rollback).',                           3, 24, 0, 0)
+ON CONFLICT (ulid) DO NOTHING;
+
+-- erft_van via CuiperDonut voor alle nieuwe componenten
+UPDATE cuiper_hive_component SET erft_van = '01COMP000DONUT0000000000'
+WHERE ulid IN (
+    '01COMP025FLAKE0000000000','01COMP026SYSTEM0000000000','01COMP027DEV000000000000',
+    '01COMP028NGINX0000000000','01COMP029DESKTOP00000000', '01COMP030HYPERON00000000',
+    '01COMP031HOME000000000000','01COMP032STANDAARD000000','01COMP033AIWERKST0000000',
+    '01COMP034MINIMAL000000000','01COMP035CLAUDECTX000000','01COMP036PROMPTSQL000000',
+    '01COMP037PROMPTPSQL00000', '01COMP038PROMPTMONGO0000','01COMP039PROMPTCYPHER000',
+    '01COMP040PROMPTDL0000000', '01COMP041CTXDUMP0000000', '01COMP042IDEE00000000000',
+    '01COMP043LOG000000000000', '01COMP044PROMPTEXP0000000','01COMP045SESSIESTART000000',
+    '01COMP046ULID0000000000000','01COMP047VERIFY000000000'
+);
 
 -- ─── CuiperWezen — orphan ideeën zonder ouder-component ──────────────────────
 -- Een Wees heeft nog geen erft_van in de hive-keten.

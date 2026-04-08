@@ -1,3 +1,10 @@
+; ─── CuiperHeader ───────────────────────────────────────────────────────────
+; ULID:          01COMP040PROMPTDL0000000
+; Naam:          ontologie/CuiperPromptOntologie.dl
+; Erft via:      CuiperCore → CuiperDonut → cuiper-datalog → CuiperPromptExportOperator
+; Aangemaakt:    CuiperStapNr 53
+; Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+; ────────────────────────────────────────────────────────────────────────────
 ; CuiperPromptOntologie.dl
 ; Datalog fact schema voor de cuiper-datalog Rust engine
 ; Erft via: Cuiper → CuiperCore → CuiperDonut → cuiper-datalog → CuiperPromptExportOperator

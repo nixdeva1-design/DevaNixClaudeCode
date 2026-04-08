@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP034MINIMAL000000000
+# Naam:          nixos/clients/minimal.nix
+# Erft via:      CuiperCore → CuiperDonut → nixos/flake.nix
+# Aangemaakt:    CuiperStapNr 26
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 # CuiperHive Klantprofiel: minimal
 # Alleen: PostgreSQL + Gitea + Redis
 # Gebruik: nixos-rebuild switch --flake .#minimal

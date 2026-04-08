@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP033AIWERKST0000000
+# Naam:          nixos/clients/ai-werkstation.nix
+# Erft via:      CuiperCore → CuiperDonut → nixos/flake.nix
+# Aangemaakt:    CuiperStapNr 26
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 # CuiperHive Klantprofiel: ai-werkstation
 # Focus: Ollama + MindsDB + MLflow + Neo4j
 # Geen: Kafka, Mosquitto, n8n, MongoDB, PHP, Ruby

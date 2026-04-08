@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP032STANDAARD000000
+# Naam:          nixos/clients/standaard.nix
+# Erft via:      CuiperCore → CuiperDonut → nixos/flake.nix
+# Aangemaakt:    CuiperStapNr 19
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 # CuiperHive Klantprofiel: standaard
 # Volledige installatie — alle services en databases actief
 # Gebruik: nixos-rebuild switch --flake .#standaard

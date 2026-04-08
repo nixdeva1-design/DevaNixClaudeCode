@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP026SYSTEM0000000000
+# Naam:          nixos/modules/CuiperSystem.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 8
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, pkgs, ... }:
 
 {
@@ -72,26 +79,28 @@
       enable = true;
       allowedTCPPorts = [
         # Standaard internet verkeer
-        80    # HTTP
-        443   # HTTPS
+        80    # HTTP  — Nginx reverse proxy
+        443   # HTTPS — Nginx reverse proxy
 
         # Beheer
         22    # SSH
 
-        # Services — intern en extern via Nginx
-        3000  # Gitea
+        # Services — direct of via Nginx (zie CuiperNginx.nix voor vhosts)
+        3001  # Gitea          (CuiperPorts: gitea = 3001)
         5678  # n8n
         3100  # Grafana
         11434 # Ollama
-        47334 # MindsDB
-        8080  # API gateway
+        47334 # MindsDB HTTP
 
         # Messaging bus
-        7447  # Zenoh
-        1883  # MQTT
+        7447  # Zenoh TCP
 
-        # Database — alleen lokaal, niet via firewall naar buiten
-        # 5432 PostgreSQL — bewust weggelaten, alleen via localhost
+        # Database — alleen lokaal, nooit via firewall naar buiten
+        # 5432 PostgreSQL — bewust weggelaten, alleen via Unix socket / localhost
+        # 27017 MongoDB    — bewust weggelaten, alleen via localhost
+        # 6379 Redis       — bewust weggelaten, alleen via localhost
+
+        # Jaeger poorten worden beheerd door CuiperJaeger.nix zelf
       ];
 
       # Uitgaand verkeer nooit blokkeren

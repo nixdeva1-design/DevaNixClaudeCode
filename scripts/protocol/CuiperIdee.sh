@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP042IDEE00000000000
+# Naam:          scripts/protocol/CuiperIdee.sh
+# Erft via:      CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst → CuiperIdeeOperator
+# Aangemaakt:    CuiperStapNr 45
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperIdee.sh — Verkorte notitie voor ideeën via ci:: prefix
 # Erft van: CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst → CuiperIdeeOperator
 #

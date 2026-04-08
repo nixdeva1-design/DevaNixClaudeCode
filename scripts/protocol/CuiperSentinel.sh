@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP006SENTINEL00000000
+# Naam:          scripts/protocol/CuiperSentinel.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 24
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperSentinel — bewaakt de staat van de repo continu
 # Detecteert: sessie-onderbreking, stroomuitval, geen connectie
 # Bij gevaar: commit en push automatisch

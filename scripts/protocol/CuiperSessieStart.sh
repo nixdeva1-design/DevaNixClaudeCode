@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP045SESSIESTART000000
+# Naam:          scripts/protocol/CuiperSessieStart.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 31
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperSessieStart.sh — PreToolUse hook
 # Schrijft SESSIE_OPEN log + verhoogt CuiperSessieNr bij nieuwe sessie
 # Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperSessieStartOperator

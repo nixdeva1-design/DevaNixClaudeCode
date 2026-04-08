@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP005STEWARD000000000
+# Naam:          scripts/protocol/CuiperSteward.sh
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 24
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperSteward — beheert continuïteit van ontwerpen en staat
 # Verschil met Sentinel:
 #   Sentinel = bewaakt en redt bij gevaar (reactief)

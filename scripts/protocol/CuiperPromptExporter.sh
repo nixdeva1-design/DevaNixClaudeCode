@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP044PROMPTEXP0000000
+# Naam:          scripts/protocol/CuiperPromptExporter.sh
+# Erft via:      CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst → CuiperPromptExportOperator
+# Aangemaakt:    CuiperStapNr 41
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperPromptExporter.sh
 # Erft van: CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst → CuiperPromptExportOperator
 #

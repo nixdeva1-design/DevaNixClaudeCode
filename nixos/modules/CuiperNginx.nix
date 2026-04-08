@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP028NGINX0000000000
+# Naam:          nixos/modules/CuiperNginx.nix
+# Erft via:      CuiperCore → CuiperDonut → CuiperServices.nix
+# Aangemaakt:    CuiperStapNr 26
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, lib, pkgs, ... }:
 
 let

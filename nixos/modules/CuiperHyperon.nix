@@ -1,3 +1,10 @@
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP030HYPERON00000000
+# Naam:          nixos/modules/CuiperHyperon.nix
+# Erft via:      CuiperCore → CuiperDonut
+# Aangemaakt:    CuiperStapNr 33
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
 { config, lib, pkgs, ... }:
 
 # ─── CuiperHyperon — OpenCog Hyperon / MeTTa runtime ──────────────────────

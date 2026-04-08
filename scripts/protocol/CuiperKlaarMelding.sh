@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP003KLAAR00000000000
+# Naam:          scripts/protocol/CuiperKlaarMelding.sh
+# Erft via:      CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst → CuiperKlaarMeldingOperator
+# Aangemaakt:    CuiperStapNr 32
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperKlaarMelding.sh
 # Doel: verplichte klaar-melding aan het einde van elke ClaudeCode respons
 # Toont: CuiperStapNr, sessie voortgang, backlog samenvatting, prioriteit hulp

@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP004BACKLOG000000
+# Naam:          scripts/protocol/CuiperBacklogPlanner.sh
+# Erft via:      CuiperCore → CuiperDonut → CuiperClaudeCodeTakenlijst → CuiperBacklogOperator
+# Aangemaakt:    CuiperStapNr 30
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperBacklogPlanner.sh — beheert de CuiperHive backlog
 # Leest openstaande taken uit trail logs en CLAUDE.md
 # Schrijft gesedimenteerde backlog naar backlog/CuiperBacklog.md

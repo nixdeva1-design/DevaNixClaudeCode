@@ -1,3 +1,10 @@
+-- ─── CuiperHeader ───────────────────────────────────────────────────────────
+-- ULID:          01COMP037PROMPTPSQL00000
+-- Naam:          ontologie/CuiperPromptOntologie.psql
+-- Erft via:      CuiperCore → CuiperDonut → CuiperPromptExportOperator
+-- Aangemaakt:    CuiperStapNr 53
+-- Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+-- ────────────────────────────────────────────────────────────────────────────
 -- CuiperPromptOntologie.psql
 -- PostgreSQL specifieke extensie van CuiperPromptOntologie.sql
 -- Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperPromptExportOperator

@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# ─── CuiperHeader ───────────────────────────────────────────────────────────
+# ULID:          01COMP041CTXDUMP0000000
+# Naam:          scripts/protocol/CuiperContextDump.sh
+# Erft via:      CuiperCore → CuiperDonut → CuiperZelfcontroleAI
+# Aangemaakt:    CuiperStapNr 45
+# Gewijzigd:     CuiperStapNr 54 — 2026-04-08
+# ────────────────────────────────────────────────────────────────────────────
+
 # CuiperContextDump.sh — dump ClaudeCode context na elke CuiperStapNr
 # Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperZelfcontroleAI
 #
