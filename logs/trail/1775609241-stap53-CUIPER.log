@@ -1,0 +1,32 @@
+ULID:                  01KNN8GN4Z9CPS2V9E5RRWQC59
+UnixTimestamp:         1775609241
+CuiperStapNr:          53
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/add-documentation-practices-cMBk1
+Vraagprompt:           schrijf je nog wel de CuiperVraagPrompt de CuiperBeredeneringPrompt het CuiperAntwoordPrompt in de verschillende extentie bestanden zodat ze ingeladen insert worden naar de databasetypen?
+Redenering:            Gap geïdentificeerd: JSON/JSONL export bestond maar schema definities per databasetype ontbraken. Drie acties: (1) /dev/null overtredingen gefix in CuiperPromptExporter.sh, (2) vijf nieuwe ontologie bestanden aangemaakt per DB type, (3) exporter uitgebreid met INSERT generatie per DB type.
+Antwoordprompt:        Nee, dat deed ik nog niet — nu wel. Schema bestanden aangemaakt voor SQLite/DuckDB (.sql), PostgreSQL (.psql), MongoDB (.mongo.js), Neo4j (.cypher), Datalog (.dl). CuiperPromptExporter.sh genereert nu naast JSON/JSONL ook .sql, .cypher, .dl, .mongo.js per export run.
+Plan:                  1.Fix /dev/null 2.Maak schema bestanden 3.Update exporter 4.Commit+push
+CuiperStatusBackup53:  CuiperPromptExporter.sh exporteert alleen JSON/JSONL. Geen schema per DB type.
+CuiperVerwachtBackup53: Vijf schema bestanden + exporter met INSERT generatie + /dev/null fix.
+Rollbackpunt:          29ec4d0
+CuiperNaVerwachtBackup53: Vijf schema bestanden aangemaakt + exporter bijgewerkt + /dev/null fix. C==B.
+
+Nabeschouwing — gekozen opties:
+  .sql (SQLite/DuckDB): zelfde SQL dialect, één bestand dekt beide engines. Meest gedeployde formaat voor lokale opslag.
+  .psql (PostgreSQL): apart van .sql want pgvector + GIN indexes zijn PostgreSQL-specifiek. Ivfflat index voor semantisch zoeken.
+  .mongo.js (MongoDB): JS formaat i.p.v. JSON zodat schema validation + sample insert in één bestand. validationAction=error i.p.v. warn (geen stille doorgang).
+  .cypher (Neo4j): MERGE patroon voor idempotentie. Graph model past bij de prompt-keten structuur (vraag→beredenering→antwoord).
+  .dl (Datalog): afgeleid redeneren over succes/fout patronen. Geen Prolog (geen oneindige recursie mogelijk — CuiperDonut-wet).
+  Exporter: Python inline script i.p.v. aparte tool — geen extra dependencies, zelfde patroon als bestaande extraheer_sessie functie.
+
+Afgewezen opties:
+  Één generiek SQL bestand voor alle DB's: onmogelijk (pgvector syntax niet compatibel met SQLite).
+  YAML formaat voor MongoDB: minder standaard dan .js voor mongosh.
+  GraphQL schema voor Neo4j: te abstract — direct Cypher is tastbaarder en direct uitvoerbaar.
+  Prolog (.pl): oneindige recursie risico, niet geschikt voor autonoom systeem.
+
+/dev/null overtredingen verklaring:
+  Regel 17 (source 2>/dev/null): source-fout werd stil genegeerd. Fix: if ! source ... dan fallback + trail log.
+  Regel 121 (-newer /dev/null): timestamp hack, verwijderd. awk filter volstaat.
+  Regel 125 (ls 2>/dev/null): ls-fout bij geen bestanden werd genegeerd. Fix: bash nullglob + expliciete fout + exit 1.

@@ -1,0 +1,199 @@
+-- CuiperPromptOntologie.psql
+-- PostgreSQL specifieke extensie van CuiperPromptOntologie.sql
+-- Erft via: Cuiper → CuiperCore → CuiperDonut → CuiperPromptExportOperator
+--
+-- CuiperStapNr: 53  ULID: 01KNN8GN4Z9CPS2V9E5RRWQC59
+-- Aangemaakt:    2026-04-08
+-- Vereist:       PostgreSQL >= 14 + pgvector extensie
+--
+-- Verschil met .sql (SQLite/DuckDB):
+--   1. pgvector kolom voor semantisch zoeken op prompt tekst
+--   2. GIN index voor full-text search (Nederlandse tekst)
+--   3. BIGSERIAL surrogate key naast ULID (PostgreSQL conventie)
+--   4. JSONB kolom voor flexibele metadata
+--   5. COPY-vriendelijk formaat voor bulk import
+--
+-- Laadopdracht:
+--   psql -U cuiper -d cuiper_db -f ontologie/CuiperPromptOntologie.psql
+-- Bulk import van gegenereerde JSONL:
+--   psql -c "\copy cuiper_vraag_prompt_import FROM 'logs/prompts/CuiperPrompts-*.jsonl'"
+--
+-- Gekozen opties (nabeschouwing):
+--   pgvector i.p.v. pg_trgm: pgvector ondersteunt semantische nabijheid,
+--   niet alleen teken-gelijkenis. Cuiper's intentie vereist semantisch zoeken.
+--   GIN i.p.v. GIST: GIN is sneller voor statische data (geen updates, alleen inserts).
+--   text i.p.v. varchar: geen vaste lengtebeperking — prompts zijn variabel.
+
+-- ─── Extensies ───────────────────────────────────────────────────────────────
+CREATE EXTENSION IF NOT EXISTS vector;      -- pgvector
+CREATE EXTENSION IF NOT EXISTS unaccent;    -- Nederlandse tekst normalisatie
+CREATE EXTENSION IF NOT EXISTS pg_trgm;     -- trigram voor hybrid search fallback
+
+-- ─── cuiper_vraag_prompt ─────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS cuiper_vraag_prompt (
+    id                  BIGSERIAL   PRIMARY KEY,     -- surrogate, PostgreSQL conventie
+    ulid                TEXT        NOT NULL UNIQUE,
+    cuiper_stap_nr      INTEGER     NOT NULL,
+    sessie_ulid         TEXT        NOT NULL,
+    unix_ms             BIGINT      NOT NULL,
+    branch              TEXT        NOT NULL,
+    hive_nr_van         SMALLINT    NOT NULL DEFAULT 2,
+    hive_nr_naar        SMALLINT    NOT NULL DEFAULT 3,
+    tekst               TEXT        NOT NULL,
+    bron                TEXT        DEFAULT 'session-jsonl',
+    is_ci_notitie       BOOLEAN     DEFAULT FALSE,
+    meta                JSONB,                       -- flexibele metadata
+    tekst_vector        vector(1536),                -- pgvector: text-embedding-ada-002 formaat
+    aangemaakt          BIGINT      NOT NULL,
+
+    CONSTRAINT uq_vraag_stap_ulid UNIQUE (cuiper_stap_nr, ulid)
+);
+
+-- GIN index voor full-text search in Nederlandse tekst
+CREATE INDEX IF NOT EXISTS idx_vraag_fts
+    ON cuiper_vraag_prompt USING GIN (to_tsvector('dutch', tekst));
+
+-- pgvector IVFFLAT index (bij > 1000 rijen effectief)
+-- lists=100 is standaard startpunt — aanpassen op basis van werkelijke rij-telling
+CREATE INDEX IF NOT EXISTS idx_vraag_vector
+    ON cuiper_vraag_prompt USING ivfflat (tekst_vector vector_cosine_ops)
+    WITH (lists = 100);
+
+CREATE INDEX IF NOT EXISTS idx_vraag_stap_nr
+    ON cuiper_vraag_prompt (cuiper_stap_nr DESC);
+
+-- ─── cuiper_beredenering_prompt ──────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS cuiper_beredenering_prompt (
+    id                  BIGSERIAL   PRIMARY KEY,
+    ulid                TEXT        NOT NULL UNIQUE,
+    vraag_ulid          TEXT        NOT NULL REFERENCES cuiper_vraag_prompt(ulid)
+                            ON DELETE RESTRICT,      -- geen DELETE zonder archivering
+    cuiper_stap_nr      INTEGER     NOT NULL,
+    sessie_ulid         TEXT        NOT NULL,
+    unix_ms             BIGINT      NOT NULL,
+    redenering          TEXT,
+    plan                TEXT,
+    markov_a            TEXT,
+    markov_b            TEXT,
+    markov_c            TEXT,
+    markov_uitkomst     TEXT CHECK (markov_uitkomst IN ('C==B', 'C!=B', NULL)),
+    rollbackpunt        TEXT,
+    tools_gebruikt      TEXT[],                      -- PostgreSQL array i.p.v. kommalijst
+    meta                JSONB,
+    redenering_vector   vector(1536),                -- pgvector voor semantisch zoeken
+    aangemaakt          BIGINT      NOT NULL,
+
+    CONSTRAINT uq_bered_stap_ulid UNIQUE (cuiper_stap_nr, ulid)
+);
+
+CREATE INDEX IF NOT EXISTS idx_bered_fts
+    ON cuiper_beredenering_prompt USING GIN (to_tsvector('dutch', COALESCE(redenering, '')));
+CREATE INDEX IF NOT EXISTS idx_bered_vector
+    ON cuiper_beredenering_prompt USING ivfflat (redenering_vector vector_cosine_ops)
+    WITH (lists = 100);
+CREATE INDEX IF NOT EXISTS idx_bered_uitkomst
+    ON cuiper_beredenering_prompt (markov_uitkomst);
+
+-- ─── cuiper_antwoord_prompt ──────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS cuiper_antwoord_prompt (
+    id                      BIGSERIAL   PRIMARY KEY,
+    ulid                    TEXT        NOT NULL UNIQUE,
+    vraag_ulid              TEXT        NOT NULL REFERENCES cuiper_vraag_prompt(ulid)
+                                ON DELETE RESTRICT,
+    beredenering_ulid       TEXT        REFERENCES cuiper_beredenering_prompt(ulid)
+                                ON DELETE RESTRICT,
+    cuiper_stap_nr          INTEGER     NOT NULL,
+    sessie_ulid             TEXT        NOT NULL,
+    unix_ms                 BIGINT      NOT NULL,
+    tekst                   TEXT        NOT NULL,
+    uitkomst                TEXT        NOT NULL DEFAULT 'SUCCES'
+                                CHECK (uitkomst IN ('SUCCES', 'FOUT', 'ROLLBACK', 'GEDEELTELIJK')),
+    nabeschouwing           TEXT,
+    gekozen_optie           TEXT,
+    afgewezen_opties        TEXT,
+    fout_code               TEXT,
+    fout_melding            TEXT,
+    fout_locatie            TEXT,
+    conflict_beschrijving   TEXT,
+    herstel_actie           TEXT,
+    meta                    JSONB,
+    tekst_vector            vector(1536),
+    aangemaakt              BIGINT      NOT NULL,
+
+    CONSTRAINT uq_antw_stap_ulid UNIQUE (cuiper_stap_nr, ulid)
+);
+
+CREATE INDEX IF NOT EXISTS idx_antw_fts
+    ON cuiper_antwoord_prompt USING GIN (to_tsvector('dutch', tekst));
+CREATE INDEX IF NOT EXISTS idx_antw_vector
+    ON cuiper_antwoord_prompt USING ivfflat (tekst_vector vector_cosine_ops)
+    WITH (lists = 100);
+CREATE INDEX IF NOT EXISTS idx_antw_uitkomst
+    ON cuiper_antwoord_prompt (uitkomst);
+-- GIN index op JSONB meta voor flexibele queries
+CREATE INDEX IF NOT EXISTS idx_antw_meta
+    ON cuiper_antwoord_prompt USING GIN (meta);
+
+-- ─── Staging tabel voor JSONL bulk import ────────────────────────────────────
+-- COPY van CuiperPromptExporter.sh output → transform → INSERT naar echte tabellen
+
+CREATE TABLE IF NOT EXISTS cuiper_prompt_import_staging (
+    sessie          TEXT,
+    timestamp       TEXT,
+    cuiper_stap_nr  INTEGER,
+    rol             TEXT,    -- 'human' | 'assistant'
+    tekst           TEXT,
+    bron            TEXT,
+    is_summary      BOOLEAN,
+    geladen_op      BIGINT DEFAULT extract(epoch from now())::BIGINT
+);
+
+-- ─── View: volledige prompt-triplet (zelfde als .sql maar PostgreSQL syntax) ──
+
+CREATE OR REPLACE VIEW cuiper_prompt_triplet AS
+    SELECT
+        v.cuiper_stap_nr,
+        v.ulid               AS vraag_ulid,
+        v.unix_ms            AS vraag_unix_ms,
+        v.tekst              AS vraag_tekst,
+        v.bron               AS vraag_bron,
+        b.ulid               AS beredenering_ulid,
+        b.redenering         AS beredenering_tekst,
+        b.plan               AS plan,
+        b.markov_uitkomst    AS markov_uitkomst,
+        b.rollbackpunt       AS rollbackpunt,
+        a.ulid               AS antwoord_ulid,
+        a.tekst              AS antwoord_tekst,
+        a.uitkomst           AS uitkomst,
+        a.nabeschouwing      AS nabeschouwing,
+        a.fout_code          AS fout_code,
+        a.fout_melding       AS fout_melding
+    FROM cuiper_vraag_prompt v
+    LEFT JOIN cuiper_beredenering_prompt b ON b.vraag_ulid = v.ulid
+    LEFT JOIN cuiper_antwoord_prompt     a ON a.vraag_ulid = v.ulid
+    ORDER BY v.cuiper_stap_nr ASC;
+
+-- ─── Functie: semantische zoekfunctie op prompt tekst ───────────────────────
+-- Gebruik: SELECT * FROM cuiper_zoek_prompt('[0.1,0.2,...]'::vector, 5);
+
+CREATE OR REPLACE FUNCTION cuiper_zoek_prompt(
+    zoek_vector vector(1536),
+    limiet      INTEGER DEFAULT 10
+)
+RETURNS TABLE (
+    stap_nr     INTEGER,
+    vraag_tekst TEXT,
+    afstand     FLOAT
+) AS $$
+    SELECT
+        v.cuiper_stap_nr,
+        v.tekst,
+        v.tekst_vector <=> zoek_vector AS afstand
+    FROM cuiper_vraag_prompt v
+    WHERE v.tekst_vector IS NOT NULL
+    ORDER BY v.tekst_vector <=> zoek_vector
+    LIMIT limiet;
+$$ LANGUAGE SQL STABLE;

@@ -1,0 +1,131 @@
+; CuiperPromptOntologie.dl
+; Datalog fact schema voor de cuiper-datalog Rust engine
+; Erft via: Cuiper → CuiperCore → CuiperDonut → cuiper-datalog → CuiperPromptExportOperator
+;
+; CuiperStapNr: 53  ULID: 01KNN8GN4Z9CPS2V9E5RRWQC59
+; Aangemaakt:    2026-04-08
+;
+; Gekozen opties (nabeschouwing):
+;   Datalog i.p.v. Prolog: Datalog heeft gegarandeerde terminatie (geen oneindige recursie).
+;   CuiperDonut eist dat passeer_ring() altijd afloopt. Prolog cut-operatoren zijn
+;   te gevaarlijk in een autonom systeem zonder menselijk toezicht.
+;   Datalog i.p.v. SQL: Datalog is geschikt voor regelgebaseerde afleidingen —
+;   bv. "als een stap een rollback heeft, dan is de sessie instabiel".
+;   SQL kan geen recursieve afleidingen zonder CTE; Datalog doet dit native.
+;   Feiten in s-expressie stijl: dichts bij de cuiper-datalog Rust engine syntax.
+;
+; Laadopdracht (cuiper-datalog Rust binary):
+;   cuiper-datalog --facts ontologie/CuiperPromptOntologie.dl --query <query.dl>
+;
+; /dev/null verbod: geen enkel feit mag worden weggegooid.
+;   Conflicten worden als apart feit geregistreerd via conflict/3.
+
+; ─── Relatie declaraties ──────────────────────────────────────────────────────
+; Format: .decl naam(arg1: type, arg2: type, ...)
+; Types: symbol (string), number (int64), float (f64)
+
+.decl vraag_prompt(
+    ulid:           symbol,
+    cuiper_stap_nr: number,
+    sessie_ulid:    symbol,
+    unix_ms:        number,
+    branch:         symbol,
+    hive_nr_van:    number,
+    tekst:          symbol,
+    bron:           symbol,
+    aangemaakt:     number
+)
+
+.decl beredenering_prompt(
+    ulid:             symbol,
+    vraag_ulid:       symbol,
+    cuiper_stap_nr:   number,
+    sessie_ulid:      symbol,
+    unix_ms:          number,
+    redenering:       symbol,
+    plan:             symbol,
+    markov_a:         symbol,
+    markov_b:         symbol,
+    markov_c:         symbol,
+    markov_uitkomst:  symbol,   ; "C==B" | "C!=B" | ""
+    rollbackpunt:     symbol,
+    aangemaakt:       number
+)
+
+.decl antwoord_prompt(
+    ulid:                   symbol,
+    vraag_ulid:             symbol,
+    beredenering_ulid:      symbol,
+    cuiper_stap_nr:         number,
+    sessie_ulid:            symbol,
+    unix_ms:                number,
+    tekst:                  symbol,
+    uitkomst:               symbol,   ; SUCCES | FOUT | ROLLBACK | GEDEELTELIJK
+    nabeschouwing:          symbol,
+    gekozen_optie:          symbol,
+    fout_code:              symbol,
+    fout_melding:           symbol,
+    herstel_actie:          symbol,
+    aangemaakt:             number
+)
+
+; ─── Afgeleide relaties (regels) ──────────────────────────────────────────────
+
+; Een stap is succesvol als de Markov transitie C==B en uitkomst SUCCES
+.decl stap_succes(cuiper_stap_nr: number, vraag_ulid: symbol)
+stap_succes(S, V) :-
+    beredenering_prompt(_, V, S, _, _, _, _, _, _, _, "C==B", _, _),
+    antwoord_prompt(_, V, _, S, _, _, _, "SUCCES", _, _, _, _, _, _).
+
+; Een stap heeft een rollback als C!=B
+.decl stap_rollback(cuiper_stap_nr: number, vraag_ulid: symbol, rollbackpunt: symbol)
+stap_rollback(S, V, R) :-
+    beredenering_prompt(_, V, S, _, _, _, _, _, _, _, "C!=B", R, _).
+
+; Een sessie is instabiel als er meer dan 0 rollbacks zijn
+.decl sessie_instabiel(sessie_ulid: symbol)
+sessie_instabiel(SES) :-
+    stap_rollback(_, V, _),
+    vraag_prompt(V, _, SES, _, _, _, _, _, _).
+
+; Alle stappen met fouten (niet SUCCES)
+.decl stap_fout(cuiper_stap_nr: number, fout_code: symbol, fout_melding: symbol)
+stap_fout(S, FC, FM) :-
+    antwoord_prompt(_, _, _, S, _, _, _, U, _, _, FC, FM, _, _),
+    U != "SUCCES".
+
+; ci:: notities die nog WEES zijn (geen antwoord_prompt met uitkomst GEADOPTEERD)
+.decl wees_idee(vraag_ulid: symbol, tekst: symbol)
+wees_idee(V, T) :-
+    vraag_prompt(V, _, _, _, _, _, T, _, _),
+    !antwoord_prompt(_, V, _, _, _, _, _, "GEADOPTEERD", _, _, _, _, _, _).
+
+; ─── Output declaraties ───────────────────────────────────────────────────────
+
+.output stap_succes(IO=file, filename="logs/datalog/stap_succes.csv", delimiter=",")
+.output stap_rollback(IO=file, filename="logs/datalog/stap_rollback.csv", delimiter=",")
+.output sessie_instabiel(IO=file, filename="logs/datalog/sessie_instabiel.csv", delimiter=",")
+.output stap_fout(IO=file, filename="logs/datalog/stap_fout.csv", delimiter=",")
+.output wees_idee(IO=file, filename="logs/datalog/wees_idee.csv", delimiter=",")
+
+; ─── Voorbeeldfeiten (template — gegenereerd door CuiperPromptExporter.sh) ───
+; CuiperPromptExporter.sh vult deze in op basis van logs/prompts/*.jsonl
+
+; vraag_prompt("01KNN8GN4Z9CVR1", 53, "sessie-abc", 1744070400000, "claude/add-documentation-practices-cMBk1", 2, "schrijf je nog wel de CuiperVraagPrompt...", "session-live", 1744070400000).
+
+; beredenering_prompt("01KNN8GN4Z9CBR1", "01KNN8GN4Z9CVR1", 53, "sessie-abc", 1744070400000,
+;   "Huidig: geen schema bestanden per DB type. Plan: maak .sql .psql .mongo.js .cypher .dl",
+;   "1. CuiperPromptOntologie.sql 2. .psql 3. .mongo.js 4. .cypher 5. .dl 6. update exporter",
+;   "logs/prompts bevat JSONL maar geen DB-type schemas",
+;   "logs/prompts + ontologie/*.sql + ontologie/*.psql + *.mongo.js + *.cypher + *.dl",
+;   "zelfde als B (alle schemas aangemaakt)",
+;   "C==B", "", 1744070400001).
+
+; antwoord_prompt("01KNN8GN4Z9CAN1", "01KNN8GN4Z9CVR1", "01KNN8GN4Z9CBR1", 53,
+;   "sessie-abc", 1744070500000,
+;   "Schema bestanden aangemaakt voor alle databasetypen...",
+;   "SUCCES",
+;   "Gekozen voor aparte extensies per DB type zodat laadmechanisme per DB verschilt",
+;   "Aparte .sql per DB type",
+;   "Één generiek SQL bestand — afgewezen: DuckDB en PostgreSQL hebben incompatibele vector/GIN syntax",
+;   "", "", "", 1744070500000).
