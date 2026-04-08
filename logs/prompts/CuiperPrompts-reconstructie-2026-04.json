@@ -1,0 +1,192 @@
+[
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-05T15:06:10.000Z",
+    "cuiper_stap_nr": 1,
+    "rol": "human",
+    "tekst": "hoe kan ik op windows 10 een startup linux usb maken die zelfstandig naast het os draait zonder iets te installeren dual boot",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-05T16:45:03.000Z",
+    "cuiper_stap_nr": 2,
+    "rol": "human",
+    "tekst": "C:\\Users\\Nicy\\Downloads\\Ventoy 1.1.11 release (6th Anniversary Ver.) source code.zip\\ventoy-Ventoy-167c874 [ventoy broncode upload]",
+    "bron": "session-jsonl",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:00:00.000Z",
+    "cuiper_stap_nr": 3,
+    "rol": "human",
+    "tekst": "You've hit your limit · resets 1pm (UTC) waar ga je nu precies op stuk, wat heb je niet kunnen vastleggen",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:05:00.000Z",
+    "cuiper_stap_nr": 4,
+    "rol": "human",
+    "tekst": "Stop hook feedback: untracked files in logs/trail/",
+    "bron": "conversation-summary",
+    "is_summary": true,
+    "notitie": "stop hook feedback, niet directe vraag"
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:10:00.000Z",
+    "cuiper_stap_nr": 5,
+    "rol": "human",
+    "tekst": "jij hebt toch de plicht elke stap in github te pushen... een vaste drempel van 80 is waanzin",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:20:00.000Z",
+    "cuiper_stap_nr": 6,
+    "rol": "human",
+    "tekst": "bouw het voorstel van Cuiperstap 30, geef me je vocabulaire — schrijven committen pushen vastleggen wat bedoel je daarmee",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:30:00.000Z",
+    "cuiper_stap_nr": 7,
+    "rol": "human",
+    "tekst": "ik wil dat je een klaar melding geeft voortaan na elke respons, prioriteit wijzigen commando tonen, /dev/null verbod amendement",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:40:00.000Z",
+    "cuiper_stap_nr": 8,
+    "rol": "human",
+    "tekst": "volg de logica, begrijp je dat alles een module is, interchangeable, client profile deployable in seconds via nixos-rebuild switch --flake .#<client>",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T10:50:00.000Z",
+    "cuiper_stap_nr": 9,
+    "rol": "human",
+    "tekst": "sla je aanpassingen op werk de volgende kritieke punten af",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T11:00:00.000Z",
+    "cuiper_stap_nr": 10,
+    "rol": "human",
+    "tekst": "wat begrijp je dat je aan het bouwen bent? verklaar stap voor stap — en geef me een menu van wat er nog mist",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T11:10:00.000Z",
+    "cuiper_stap_nr": 11,
+    "rol": "human",
+    "tekst": "1 CuiperListener.sh met Jaeger tracing. 2,3 CuiperOerOntologie staan de eind vector, CuiperBewaker, Cuip stub",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T11:20:00.000Z",
+    "cuiper_stap_nr": 12,
+    "rol": "human",
+    "tekst": "wat zijn de volgende prioriteiten wat mist er",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T11:25:00.000Z",
+    "cuiper_stap_nr": 13,
+    "rol": "human",
+    "tekst": "Stop hook feedback: There are untracked files in logs/trail/",
+    "bron": "conversation-summary",
+    "is_summary": true
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T11:30:00.000Z",
+    "cuiper_stap_nr": 14,
+    "rol": "human",
+    "tekst": "b e f — Rust tests + CuiperListener integratie in Counter + cuiper-router crate",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T14:11:11.397Z",
+    "cuiper_stap_nr": 35,
+    "rol": "human",
+    "tekst": "Continue from where you left off.",
+    "bron": "session-jsonl",
+    "is_summary": false
+  },
+  {
+    "sessie": "reconstructie-uit-samenvatting",
+    "timestamp": "2026-04-06T14:15:00.000Z",
+    "cuiper_stap_nr": 36,
+    "rol": "human",
+    "tekst": "doe een audit op jezelf je stopt weer zonder waarschuwing",
+    "bron": "conversation-summary",
+    "is_summary": false
+  },
+  {
+    "sessie": "f1c58cbc-b07c-48d5-a65f-f2e66b401cf2",
+    "timestamp": "2026-04-06T22:44:45.799Z",
+    "cuiper_stap_nr": 37,
+    "rol": "human",
+    "tekst": "welke prios staan open",
+    "bron": "session-jsonl",
+    "is_summary": false
+  },
+  {
+    "sessie": "f1c58cbc-b07c-48d5-a65f-f2e66b401cf2",
+    "timestamp": "2026-04-06T22:50:00.000Z",
+    "cuiper_stap_nr": 38,
+    "rol": "human",
+    "tekst": "BacklogOperator/TrailLogOperator etc — wat zijn dit voor modules? wat staat er in zijn het .sh of jsonL en waarom staat er geen Cuiper voor waardoor de modules erven van Cuiper als je bij torenoperaties de torenmachten van torenmachten recursie ingaat",
+    "bron": "session-live",
+    "is_summary": false
+  },
+  {
+    "sessie": "f1c58cbc-b07c-48d5-a65f-f2e66b401cf2",
+    "timestamp": "2026-04-06T23:00:00.000Z",
+    "cuiper_stap_nr": 39,
+    "rol": "human",
+    "tekst": "Cuiper → CuiperCore → CuiperClaudeCodeTakenlijst ← erft van Cuiper → CuiperBacklogOperator ← erft van CuiperClaudeCodeTakenlijst → CuiperBacklogPlanner.sh ← erft van CuiperBacklogOperator",
+    "bron": "session-live",
+    "is_summary": false
+  },
+  {
+    "sessie": "f1c58cbc-b07c-48d5-a65f-f2e66b401cf2",
+    "timestamp": "2026-04-06T23:10:00.000Z",
+    "cuiper_stap_nr": 40,
+    "rol": "human",
+    "tekst": "alle vaste zaken waarden normen wetten geweten zitten in CuiperCore waarin een methode CuiperDonut wat weer allemaal erft van Cuiper",
+    "bron": "session-live",
+    "is_summary": false
+  },
+  {
+    "sessie": "f1c58cbc-b07c-48d5-a65f-f2e66b401cf2",
+    "timestamp": "2026-04-06T23:20:00.000Z",
+    "cuiper_stap_nr": 41,
+    "rol": "human",
+    "tekst": "je antwoord zonder de CuiperHeader ulid CuiperStapNr lees je instructies vanaf het allereerste begin en doe meteen een controle of niets vergeten is vanaf het 1e moment eerste vraag van de chat thread. heb je alles gedocumenteerd ik zie de chat promptvragen beredeneringprompt en antwoordprompts niet in de github zoals gevraagd controleer alle prompts vanaf 2 april 2026 ik wil die in een json en jsonL. ik wil ook de nixos yml terugzien. ik betaal voor de generatie van code niet om leuk te praten ik wil resultaat overhouden in tastbare code dat is een ClaudeCode taak met continu mandaat",
+    "bron": "session-live",
+    "is_summary": false
+  }
+]

@@ -1,0 +1,27 @@
+ULID:                  01KNJ7HMGYJR6M5R8XSGQ6Q52Y
+UnixTimestamp:         1775507132
+CuiperStapNr:          33
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/linux-usb-dual-boot-Hsk67
+Vraagprompt:           Modulaire architectuur + KRITIEK backlog items afwerken
+Redenering:            Alles moet een uitwisselbare module zijn. Klant A krijgt andere config
+                       dan klant B. Seconden, niet uren. Hardcoded paden en vaste configs
+                       zijn het tegendeel van dit principe. Tegelijk KRITIEK items afronden.
+Antwoordprompt:        Zeven componenten gebouwd en vastgelegd.
+Plan:                  1. CuiperConfig.env — centrale config, sourced door alle scripts
+                       2. Scripts refactored — hardcoded paden vervangen
+                       3. CuiperServices.nix — enable per service
+                       4. CuiperDatabases.nix — enable per database
+                       5. CuiperNginx.nix — poorten via CuiperPorts, vhosts conditioneel
+                       6. nixos/clients/ — standaard, ai-werkstation, minimal profielen
+                       7. flake.nix — mkCuiperSystem helper, meerdere outputs
+                       8. Cargo.toml workspace — cuiper-core, cuiper-bus, cuiper-datalog
+                       9. cuiper-core — entiteit, hive, markov, mandaat types
+                       10. cuiper-bus — Zenoh namespace wrapper
+                       11. cuiper-datalog — forward chaining Datalog engine
+                       12. CuiperHyperon.nix — OpenCog Hyperon module
+                       13. .gitignore
+CuiperStatusBackup33:  6694ecd — stap 32, hardcoded paden, geen modulaire NixOS, geen Rust
+CuiperVerwachtBackup33: alle paden via CuiperConfig.env, NixOS fully modular, Rust workspace actief
+Rollbackpunt:          6694ecd
+CuiperNaVerwachtBackup33: 38e5830 gepusht — C == B, transitie geslaagd

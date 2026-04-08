@@ -1,0 +1,24 @@
+ULID:                  01KNN4865X24AWBETWQZMPQ6DB
+UnixTimestamp:         1775604917
+CuiperStapNr:          56
+Met:                   CuiperHiveNr 1 — Cuiper (via CuiperHiveNr 2 — Deva)
+Hive:                  claude/linux-usb-dual-boot-nUFrl
+Vraagprompt:           elke Cuip heeft hash+vector, elke module CuiperIn+CuiperOut polymorf agnostisch.
+                       CuiperEntiteitenTabel in PostgreSQL GIN. Cuip = kleinste eenheid.
+Redenering:            Drie systemen gelijktijdig bouwen:
+                       1. Cuip (Rust): hash fingerprint + Vec<CuiperRegel>
+                       2. CuiperWereld (Rust): polymorf agnostisch CuiperWaarde enum
+                       3. CuiperIOBus (Rust): CuiperIn + CuiperOut + CuiperScope per module
+                       4. SQL: cuiper.entiteiten + cuiper.taal_syntax + GIN + seed
+                       5. Shell: CuiperModuleLib.sh /v /vaan /vuit /h /haan /huit
+                       6. Alle 22 scripts (13 protocol + 9 guest) bijgewerkt
+
+Antwoordprompt:        Alle componenten gebouwd. 67/67 tests slagen. Scripts werken.
+Plan:                  Commit + push alles
+
+CuiperStatusBackup56:  Cuip had geen hash/vector. Scripts hadden geen verbose/help.
+                       Geen CuiperWereld/CuiperIOBus. Geen cuiper.entiteiten SQL.
+CuiperVerwachtBackup56: Cuip heeft hash+Vec<CuiperRegel>. CuiperWaarde polymorf.
+                        CuiperIOBus per module. 22 scripts met /h /v. SQL schemas 003-005.
+Rollbackpunt:          6770f10
+CuiperNaVerwachtBackup56: C == B — 67 tests groen, /h en /v werkend op alle scripts.

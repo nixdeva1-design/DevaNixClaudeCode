@@ -1,0 +1,20 @@
+ULID:                  01KNHKQZ6AC1Y5M4G87AF6XV85
+UnixTimestamp:         1775486368
+CuiperStapNr:          32
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/linux-usb-dual-boot-Hsk67
+Vraagprompt:           KlaarMelding verplichting, prioriteit wijzigen, /dev/null verbod amendement
+Redenering:            /dev/null schendingen in CuiperPromptCounter.sh: 10+ locaties hadden
+                       2>/dev/null waardoor foutinformatie werd vernietigd. Dit is een
+                       protocol schending. Elke fout is informatie (eerste principe).
+                       Tevens: geen klaar-melding na elke stap, geen prioriteit commando.
+Antwoordprompt:        Alle drie problemen opgelost en vastgelegd.
+Plan:                  1. CuiperPromptCounter.sh — /dev/null vervangen door log_fout() patroon
+                       2. CuiperBacklogPlanner.sh — prioriteit + status commando toegevoegd
+                       3. CuiperKlaarMelding.sh — nieuw script, verplichte afsluiting
+                       4. CLAUDE.md — KlaarMelding als protocol verplichting stap 7
+                       5. Commit + push
+CuiperStatusBackup32:  3346286 — stap 31, /dev/null schendingen aanwezig, geen klaarmelding
+CuiperVerwachtBackup32: /dev/null volledig afwezig, klaarmelding verplicht, prioriteit wijzigbaar
+Rollbackpunt:          3346286
+CuiperNaVerwachtBackup32: 2352261 gepusht — C == B, transitie geslaagd
