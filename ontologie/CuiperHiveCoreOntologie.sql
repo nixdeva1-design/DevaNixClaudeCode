@@ -238,7 +238,8 @@ VALUES
 ('01COMP044PROMPTEXP0000000','CuiperPromptExporter',           'script',     'scripts/protocol/CuiperPromptExporter.sh',     'Exporteert sessie prompts naar JSON/JSONL + SQL/Cypher/DL/Mongo INSERT.',       3, 41, 0, 0),
 ('01COMP045SESSIESTART000000','CuiperSessieStart',             'script',     'scripts/protocol/CuiperSessieStart.sh',        'PreToolUse hook: SESSIE_OPEN log + CuiperSessieNr verhogen.',                   3, 31, 0, 0),
 ('01COMP046ULID0000000000000','CuiperUlid',                    'script',     'scripts/protocol/CuiperUlid.sh',               'Genereert ULID. Gebruikt door alle protocol scripts.',                          3, 24, 0, 0),
-('01COMP047VERIFY000000000', 'CuiperVerify',                   'script',     'scripts/protocol/CuiperVerify.sh',             'Markov C bepalen: C==B (succes) of C!=B (rollback).',                           3, 24, 0, 0)
+('01COMP047VERIFY000000000', 'CuiperVerify',                   'script',     'scripts/protocol/CuiperVerify.sh',             'Markov C bepalen: C==B (succes) of C!=B (rollback).',                           3, 24, 0, 0),
+('01COMP048HANDLEIDING000000','CuiperAGINixOSHandleiding',    'ontologie',  'docs/CuiperAGINixOSHandleiding.md',             'Fysieke installatie handleiding NixOS op USB voor kantoor. Met scaffolding.', 1, 55, 0, 0)
 ON CONFLICT (ulid) DO NOTHING;
 
 -- erft_van via CuiperDonut voor alle nieuwe componenten
@@ -251,7 +252,8 @@ WHERE ulid IN (
     '01COMP037PROMPTPSQL00000', '01COMP038PROMPTMONGO0000','01COMP039PROMPTCYPHER000',
     '01COMP040PROMPTDL0000000', '01COMP041CTXDUMP0000000', '01COMP042IDEE00000000000',
     '01COMP043LOG000000000000', '01COMP044PROMPTEXP0000000','01COMP045SESSIESTART000000',
-    '01COMP046ULID0000000000000','01COMP047VERIFY000000000'
+    '01COMP046ULID0000000000000','01COMP047VERIFY000000000',
+    '01COMP048HANDLEIDING000000'
 );
 
 -- ─── CuiperWezen — orphan ideeën zonder ouder-component ──────────────────────

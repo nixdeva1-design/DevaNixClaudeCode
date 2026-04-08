@@ -1,0 +1,20 @@
+ULID:                  01KNNB0Y99RQ6JZN5YHXXB183Q
+UnixTimestamp:         1775611689
+CuiperStapNr:          55
+Met:                   CuiperHiveNr 2 — Deva
+Hive:                  claude/add-documentation-practices-cMBk1
+Vraagprompt:           bereid CuiperAGINixOSHandleiding — installatie handleiding kleine genummerde stappen fysieke installatie NixOS op USB kantoor met documentatie scaffolding voor en tijdens installatie
+Redenering:            Handleiding aangemaakt als docs/CuiperAGINixOSHandleiding.md. 72 genummerde stappen verdeeld over 20 delen: voorbereiding, BIOS, netwerk, partitionering, btrfs subvolumes, installatie, eerste boot, ClaudeCode, SSH, MindsDB, eindcontrole. Scaffolding: installatierapport (Deel 0) en probleemlogboek (Deel 9) beide in-document invulformulieren.
+Antwoordprompt:        docs/CuiperAGINixOSHandleiding.md aangemaakt. 72 stappen, 20 delen, 2 scaffolding formulieren, bekende foutcodes tabel, 3 bijlagen.
+CuiperStatusBackup55:  Geen installatie handleiding aanwezig.
+CuiperVerwachtBackup55: docs/CuiperAGINixOSHandleiding.md met 72 stappen + scaffolding.
+Rollbackpunt:          25ced22
+CuiperNaVerwachtBackup55: C==B. Handleiding aangemaakt.
+
+Nabeschouwing — gekozen opties:
+  Markdown formaat: direct te renderen in Gitea, printbaar, versie beheer.
+  72 kleine stappen i.p.v. grote blokken: fouten zijn gemakkelijker te lokaliseren per stap.
+  Scaffolding als ingebedde formulieren (Deel 0 + Deel 9): de handleiding IS het installatierapport — geen apart document nodig.
+  Probleemlogboek in de handleiding zelf: de installateur schrijft problemen direct bij de stap. Geen losse notitieblok nodig.
+  Bekende foutcodes tabel: afgeleid van de 3 NixOS blockers die in stap 54 zijn gevonden. Niet speculatief maar bewezen problemen.
+  3 bijlagen (snelreferentie, meerdere computers, profiel wisselen): kantoor context vereist dat de USB op verschillende computers werkt.
