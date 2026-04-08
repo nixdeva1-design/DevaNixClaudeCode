@@ -23,7 +23,7 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 | 01JWQN06 | KLAAR | HOOG | CuiperHeader definitie in code bestanden | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
 | 01JWQN07 | KLAAR | HOOG | Cuip stub implementatie | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
 | 01JWQN08 | OPEN | HOOG | GNN pipeline (Neo4j → training data) | 23 | 01JWQN9K5R8PXWV2LD4HBCDS7N |
-| 01JWQN09 | OPEN | HOOG | NixOS installatie op USB (stap 3) | 8 | 01JWQMK8P3N6RXVW4LD7YCBHS2 |
+| 01JWQN09 | BEZIG | HOOG | NixOS installatie op USB (stap 3) | 8 | 01JWQMK8P3N6RXVW4LD7YCBHS2 |
 | 01JWQN10 | OPEN | MEDIUM | CuiperDatabases.nix MongoDB btrfs waarschuwing oplossen | 19 | 01JWQN28R5P9SXWV4KD7HBCDT6 |
 | 01JWQN11 | OPEN | MEDIUM | CuiperServices.nix Kafka KRaft modus (geen Zookeeper) | 19 | 01JWQN28R5P9SXWV4KD7HBCDT6 |
 | 01JWQN12 | OPEN | MEDIUM | MindsDB als NixOS service volledig configureren | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
