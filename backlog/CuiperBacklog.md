@@ -20,7 +20,7 @@ Prioriteit: KRITIEK | HOOG | MEDIUM | LAAG
 | 01JWQN03 | KLAAR | KRITIEK | OpenCog Hyperon NixOS module | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
 | 01JWQN04 | KLAAR | HOOG | CuiperNginx.nix poorten via CuiperPorts.nix | 20 | 01JWQN3K7P8RXWV2LD4HBCDS7N |
 | 01JWQN05 | OPEN | HOOG | API gateway module (CuiperApiGateway.nix) | 26 | 01JWQNF6R8P9SXWN4KD3HBCDS2T |
-| 01JWQN06 | OPEN | HOOG | CuiperHeader definitie in code bestanden | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
+| 01JWQN06 | KLAAR | HOOG | CuiperHeader definitie in code bestanden | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
 | 01JWQN07 | KLAAR | HOOG | Cuip stub implementatie | 24 | 01JWQNB2K6P8RXWN4LD7HCBDS9T |
 | 01JWQN08 | OPEN | HOOG | GNN pipeline (Neo4j → training data) | 23 | 01JWQN9K5R8PXWV2LD4HBCDS7N |
 | 01JWQN09 | OPEN | HOOG | NixOS installatie op USB (stap 3) | 8 | 01JWQMK8P3N6RXVW4LD7YCBHS2 |
